@@ -19,9 +19,14 @@
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+    </android.support.design.widget.AppBarLayout>
+    <android.support.v4.view.ViewPager
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pager">
         <android.support.v4.view.PagerTabStrip
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </android.support.v4.view.PagerTabStrip>
-    </android.support.design.widget.AppBarLayout>
+    </android.support.v4.view.ViewPager>
 </android.support.design.widget.CoordinatorLayout>
