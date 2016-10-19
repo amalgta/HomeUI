@@ -27,7 +27,7 @@ public class MainActivity extends FragmentActivity {
     private ViewPager mPager;
 
     /**
-     * The pager adapter, which provides the pages to the view pager widget.
+     * The pager adapter, which provides the pages to the view_acmeterview_background pager widget.
      */
     private PagerAdapter mPagerAdapter;
 
