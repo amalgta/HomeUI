@@ -15,13 +15,12 @@ import com.styx.gta.homeui.R;
  */
 
 public class FontTextView extends TextView {
-    static final String TAG="FontTextView";
     String fontname;
+
     void init() {
         if (fontname == null)
             fontname = getContext().getString(R.string.regular_font_ext);
         getPaint().setTypeface(TypeFaceProvider.getTypeFaceWithExt(getContext(), fontname));
-
     }
 
     void processattr(AttributeSet attrs) {
@@ -32,12 +31,10 @@ public class FontTextView extends TextView {
 
         try {
             fontname = a.getString(R.styleable.Font_font);
-            Log.d(TAG, fontname);
+            Log.d("sssFont", fontname);
         } finally {
             a.recycle();
         }
-
-
     }
 
     public FontTextView(Context context) {
