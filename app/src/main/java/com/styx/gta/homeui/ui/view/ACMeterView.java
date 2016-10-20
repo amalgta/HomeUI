@@ -32,15 +32,73 @@ import com.styx.gta.homeui.R;
 public class ACMeterView extends View {
     String TAG=getClass().getCanonicalName();
 
-    private String value;
-    private float radius;
+    private String          value;
+    private float           radius;
+    private int             meterColor;
+    private int             meterValueTextColor;
 
-    private int meterColor, meterValueTextColor;
 
-    private Paint circlePaint;
+    public void rotateDialer(float angle){
+        Log.d(TAG,"Angle : "+angle);
+    }
+    public class  ACMeterTouchListener implements OnTouchListener{
+        private double startAngle;
 
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            Log.e("GTA",event.toString());
+
+            switch (event.getAction()) {
+
+                case MotionEvent.ACTION_DOWN:
+                    startAngle = getAngle(event.getX(), event.getY());
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    double currentAngle = getAngle(event.getX(), event.getY());
+                    rotateDialer((float) (startAngle - currentAngle));
+                    startAngle = currentAngle;
+                    break;
+
+                case MotionEvent.ACTION_UP:
+
+                    break;
+            }
+            return false;
+        }
+        /**
+         * @return The angle of the unit circle with the image view's center
+         */
+        private double getAngle(double xTouch, double yTouch) {
+            double x = xTouch - (getWidth() / 2d);
+            double y = getHeight() - yTouch - (getHeight() / 2d);
+
+            switch (getQuadrant(x, y)) {
+                case 1:
+                    return Math.asin(y / Math.hypot(x, y)) * 180 / Math.PI;
+                case 2:
+                    return 180 - Math.asin(y / Math.hypot(x, y)) * 180 / Math.PI;
+                case 3:
+                    return 180 + (-1 * Math.asin(y / Math.hypot(x, y)) * 180 / Math.PI);
+                case 4:
+                    return 360 + Math.asin(y / Math.hypot(x, y)) * 180 / Math.PI;
+                default:
+                    return 0;
+            }
+        }
+
+        /**
+         * @return The selected quadrant.
+         */
+        private int getQuadrant(double x, double y) {
+            if (x >= 0) {
+                return y >= 0 ? 1 : 4;
+            } else {
+                return y >= 0 ? 2 : 3;
+            }
+        }
+    }
     private void setupView(Context mContext, AttributeSet attrs) {
-        circlePaint = new Paint();
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs,
                 R.styleable.ACMeterView, 0, 0);
         try {
@@ -51,6 +109,7 @@ public class ACMeterView extends View {
         } finally {
             a.recycle();
         }
+        setOnTouchListener(new ACMeterTouchListener());
     }
 
     @Override
@@ -94,31 +153,6 @@ public class ACMeterView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-    /*
-        //super.onDraw(canvas);
-        int viewWidthHalf = this.getMeasuredWidth() / 2;
-        int viewHeightHalf = this.getMeasuredHeight() / 2;
-        //get the radius as half of the width or height, whichever is smaller
-        //subtract ten so that it has some space around it
-        int radius = 0;
-        if (viewWidthHalf > viewHeightHalf) {
-            radius = viewHeightHalf - 10;
-        } else {
-            radius = viewWidthHalf - 10;
-        }
-        circlePaint.setStyle(Style.FILL);
-        circlePaint.setAntiAlias(true);
-        //set the paint color using the circle color specified
-        circlePaint.setColor(meterColor);
-        canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius, circlePaint);
-        //set text properties
-        circlePaint.setTextAlign(Paint.Align.CENTER);
-        circlePaint.setTextSize(50);
-        circlePaint.setColor(meterValueTextColor);
-        //draw the text using the string attribute and chosen properties
-        canvas.drawText(String.valueOf(value), viewWidthHalf, viewHeightHalf+15, circlePaint);
-        */
-
         actualDraw(canvas);
     }
     void actualDraw(Canvas mCanvas){
@@ -131,7 +165,7 @@ public class ACMeterView extends View {
         mPaintBase.setDither(true);
         mPaintBase.setStyle(Style.STROKE);
         mPaintBase.setStrokeCap(Paint.Cap.BUTT);
-        mPaintBase.setStrokeWidth(radius / 8.0f);
+        mPaintBase.setStrokeWidth(radius / 6.0f);
         mPaintBase.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xff2D293E,0xff252437,Shader.TileMode.CLAMP));
 
         mBaseRectangle.set(mOffset, mOffset, (radius*2)-mOffset, (radius*2)-mOffset);
@@ -144,7 +178,7 @@ public class ACMeterView extends View {
         mPaintCold.setDither(true);
         mPaintCold.setStyle(Style.STROKE);
         mPaintCold.setStrokeCap(Paint.Cap.BUTT);
-        mPaintCold.setStrokeWidth(radius / 8.0f);
+        mPaintCold.setStrokeWidth(radius / 6.0f);
         mPaintCold.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xffFFFFFF,0xffEFEFEF,Shader.TileMode.CLAMP));
 
 
@@ -156,7 +190,7 @@ public class ACMeterView extends View {
         mPaintIndex.setDither(true);
         mPaintIndex.setStyle(Style.STROKE);
         mPaintIndex.setStrokeCap(Paint.Cap.BUTT);
-        mPaintIndex.setStrokeWidth(radius / 8.0f);
+        mPaintIndex.setStrokeWidth(radius / 6.0f);
         mPaintIndex.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xff3D8DD4,0xff4AAAFF,Shader.TileMode.CLAMP));
 
         Path mIndexPath = new Path();
@@ -168,7 +202,7 @@ public class ACMeterView extends View {
         mPaintWarm.setDither(true);
         mPaintWarm.setStyle(Style.STROKE);
         mPaintWarm.setStrokeCap(Paint.Cap.BUTT);
-        mPaintWarm.setStrokeWidth(radius / 8.0f);
+        mPaintWarm.setStrokeWidth(radius / 6.0f);
         mPaintWarm.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xffF20884,0xffF20884,Shader.TileMode.CLAMP));
 
         Path mWarmPath = new Path();

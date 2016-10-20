@@ -22,6 +22,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_home, container, false);
+        ACMeterView mACMeter=(ACMeterView)rootView.findViewById(R.id.donutChart);
         return rootView;
     }
 }
