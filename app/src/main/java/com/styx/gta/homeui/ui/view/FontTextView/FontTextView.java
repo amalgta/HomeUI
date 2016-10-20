@@ -15,6 +15,8 @@ import com.styx.gta.homeui.R;
  */
 
 public class FontTextView extends TextView {
+    String TAG=getClass().getCanonicalName();
+
     String fontname;
 
     void init() {
@@ -28,10 +30,9 @@ public class FontTextView extends TextView {
                 attrs,
                 R.styleable.Font,
                 0, 0);
-
         try {
             fontname = a.getString(R.styleable.Font_font);
-            Log.d("sssFont", fontname);
+            Log.d(TAG, fontname);
         } finally {
             a.recycle();
         }

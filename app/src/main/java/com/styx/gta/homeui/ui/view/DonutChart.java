@@ -1,4 +1,4 @@
-package com.styx.gta.homeui.ui.view.DonutChart;
+package com.styx.gta.homeui.ui.view;
 
 import android.view.View;
 
@@ -46,7 +46,8 @@ public class DonutChart extends View {
         );
 
         try {
-            radius = a.getDimension(R.styleable.DonutChart_radius, 20.0f);
+            radius = (250.0f);
+           // radius = a.getDimension(R.styleable.DonutChart_radius, 20.0f);
         } finally {
             a.recycle();
         }
@@ -100,7 +101,7 @@ public class DonutChart extends View {
         setGradient(0xff2D293E,0xff252437);
         drawDonut(canvas,paint, 180,359.9f);
 
-        setGradient(0xffF20884,0xffD40880);
+        setGradient(0xffF20884,0xffF20884);
         drawDonut(canvas,paint, 15,7f);
 
         setGradient(0xffFFFFFF,0xffCDCDCD);
@@ -115,7 +116,6 @@ public class DonutChart extends View {
     }
 
     public void drawDonut(Canvas canvas, Paint paint, float start,float sweep){
-
         myPath.reset();
         myPath.arcTo(outterCircle, start, sweep, false);
         myPath.arcTo(innerCircle, start+sweep, -sweep, false);

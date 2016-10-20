@@ -2,5 +2,6 @@
     <string name="app_name">HomeUI</string>
 
     <string name="regular_font">FuturaStd-Regular.ttf</string>
+    <string name="regular_fontt">fonts/FuturaStd-Regular.ttf</string>
     <string name="regular_font_ext">fonts/FuturaStd-Regular.ttf</string>
 </resources>
