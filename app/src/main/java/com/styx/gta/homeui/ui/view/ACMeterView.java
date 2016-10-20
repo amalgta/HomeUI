@@ -38,7 +38,7 @@ public class ACMeterView extends View implements OnGestureListener {
     private float           radius;
     private int             meterColor;
     private int             meterValueTextColor;
-
+    private float                 theDegree;
     private GestureDetector 	gestureDetector;
     private boolean 			mState = false;
     private float 				mAngleDown , mAngleUp;
@@ -79,6 +79,8 @@ public class ACMeterView extends View implements OnGestureListener {
         if (deg >= 210 || deg <= 150) {
             if (deg > 180) deg = deg - 360;
             Matrix matrix=new Matrix();
+            invalidate();
+            theDegree=deg;
             Log.e("GTA",deg+"");//getWidth()/2, getHeight()/2);
         }
     }
@@ -210,7 +212,6 @@ public class ACMeterView extends View implements OnGestureListener {
 
         RectF mBaseRectangle=new RectF();
         float mOffset = .20f * radius;
-
         //Paint Setup - Base
         Paint mPaintBase = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintBase.setDither(true);
@@ -245,7 +246,7 @@ public class ACMeterView extends View implements OnGestureListener {
         mPaintIndex.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xff3D8DD4,0xff4AAAFF,Shader.TileMode.CLAMP));
 
         Path mIndexPath = new Path();
-        mIndexPath.arcTo(mBaseRectangle, 359, 2, false);
+        mIndexPath.arcTo(mBaseRectangle, theDegree, 2, false);
 
 
         //Paint Setup - Warm
@@ -270,6 +271,7 @@ public class ACMeterView extends View implements OnGestureListener {
     public ACMeterView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setupView(context, attrs);
+        theDegree=0;
     }
 
     public ACMeterView(Context context, AttributeSet attrs, int defStyleAttr) {
