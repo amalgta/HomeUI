@@ -33,19 +33,29 @@ import com.styx.gta.homeui.R;
 
 public class ACMeterView extends View implements OnGestureListener {
     String TAG=getClass().getCanonicalName();
-
+    //UI Values
     private String          value;
     private float           radius;
     private int             meterColor;
     private int             meterValueTextColor;
-    private float                 theDegree;
+
+    //Component Values
+    float                   currentDegree;
+    float                   maxDegree;
+    float                   minDegree;
+    //boolean               isDegree; //TODO Add Degree/Fahrenheit Units
+
     private GestureDetector 	gestureDetector;
     private boolean 			mState = false;
     private float 				mAngleDown , mAngleUp;
 
-    @Override public boolean onTouchEvent(MotionEvent event) {
-        if (gestureDetector.onTouchEvent(event)) return true;
-        else return super.onTouchEvent(event);
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (gestureDetector.onTouchEvent(event)) {
+            return true;
+        }else {
+            return super.onTouchEvent(event);
+        }
     }
 
     @Override
@@ -76,13 +86,12 @@ public class ACMeterView extends View implements OnGestureListener {
     }
     public void setRotorPosAngle(float deg) {
 
-        if (deg >= 210 || deg <= 150) {
+       // if (deg >= 270 || deg <= 180) {
             if (deg > 180) deg = deg - 360;
-            Matrix matrix=new Matrix();
             invalidate();
-            theDegree=deg;
+            currentDegree=deg;
             Log.e("GTA",deg+"");//getWidth()/2, getHeight()/2);
-        }
+     //   }
     }
     public void setRotorPercentage(int percentage) {
         int posDegree = percentage * 3 - 150;
@@ -94,15 +103,17 @@ public class ACMeterView extends View implements OnGestureListener {
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         float x = e2.getX() / ((float) getWidth());
         float y = e2.getY() / ((float) getHeight());
-        float rotDegrees = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
+        float rotDegrees = cartesianToPolar(1 - x, 1 - y);
+        // 1- to correct our custom axis direction
 
         if (! Float.isNaN(rotDegrees)) {
             // instead of getting 0-> 180, -180 0 , we go for 0 -> 360
             float posDegrees = rotDegrees;
-            if (rotDegrees < 0) posDegrees = 360 + rotDegrees;
+            if (rotDegrees < 0)
+                posDegrees = 360 + rotDegrees;
 
             // deny full rotation, start start and stop point, and get a linear scale
-            if (posDegrees > 210 || posDegrees < 150) {
+            //if (posDegrees > 210 || posDegrees < 150) {
                 // rotate our imageview
                 setRotorPosAngle(posDegrees);
                 // get a linear scale
@@ -111,8 +122,8 @@ public class ACMeterView extends View implements OnGestureListener {
                 int percent = (int) (scaleDegrees / 3);
                 if (m_listener != null) m_listener.onRotate(percent);
                 return true; //consumed
-            } else
-                return false;
+           // } else
+           //     return false;
         } else
             return false; // not consumed
     }
@@ -246,7 +257,7 @@ public class ACMeterView extends View implements OnGestureListener {
         mPaintIndex.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xff3D8DD4,0xff4AAAFF,Shader.TileMode.CLAMP));
 
         Path mIndexPath = new Path();
-        mIndexPath.arcTo(mBaseRectangle, theDegree, 2, false);
+        mIndexPath.arcTo(mBaseRectangle, currentDegree-90, 2, false);
 
 
         //Paint Setup - Warm
@@ -271,7 +282,7 @@ public class ACMeterView extends View implements OnGestureListener {
     public ACMeterView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setupView(context, attrs);
-        theDegree=0;
+        currentDegree=0;
     }
 
     public ACMeterView(Context context, AttributeSet attrs, int defStyleAttr) {
