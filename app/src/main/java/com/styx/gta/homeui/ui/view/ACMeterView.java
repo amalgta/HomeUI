@@ -3,6 +3,7 @@ package com.styx.gta.homeui.ui.view;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
@@ -21,6 +22,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
+import android.widget.ImageView;
 
 import com.styx.gta.homeui.R;
 
@@ -29,7 +31,7 @@ import com.styx.gta.homeui.R;
  * Created by amal.george on 19-10-2016.
  */
 
-public class ACMeterView extends View {
+public class ACMeterView extends View implements OnGestureListener {
     String TAG=getClass().getCanonicalName();
 
     private String          value;
@@ -37,68 +39,109 @@ public class ACMeterView extends View {
     private int             meterColor;
     private int             meterValueTextColor;
 
+    private GestureDetector 	gestureDetector;
+    private boolean 			mState = false;
+    private float 				mAngleDown , mAngleUp;
 
-    public void rotateDialer(float angle){
-        Log.d(TAG,"Angle : "+angle);
+    @Override public boolean onTouchEvent(MotionEvent event) {
+        if (gestureDetector.onTouchEvent(event)) return true;
+        else return super.onTouchEvent(event);
     }
-    public class  ACMeterTouchListener implements OnTouchListener{
-        private double startAngle;
 
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            Log.e("GTA",event.toString());
+    @Override
+    public boolean onDown(MotionEvent e) {
+        float x = e.getX() / ((float) getWidth());
+        float y = e.getY() / ((float) getHeight());
+        mAngleDown = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
+        return true;
+    }
 
-            switch (event.getAction()) {
+    @Override
+    public void onShowPress(MotionEvent e) {
 
-                case MotionEvent.ACTION_DOWN:
-                    startAngle = getAngle(event.getX(), event.getY());
-                    break;
+    }
 
-                case MotionEvent.ACTION_MOVE:
-                    double currentAngle = getAngle(event.getX(), event.getY());
-                    rotateDialer((float) (startAngle - currentAngle));
-                    startAngle = currentAngle;
-                    break;
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        float x = e.getX() / ((float) getWidth());
+        float y = e.getY() / ((float) getHeight());
+        mAngleUp = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
 
-                case MotionEvent.ACTION_UP:
-
-                    break;
-            }
-            return false;
+        // if we click up the same place where we clicked down, it's just a button press
+        if (! Float.isNaN(mAngleDown) && ! Float.isNaN(mAngleUp) && Math.abs(mAngleUp-mAngleDown) < 10) {
+            SetState(!mState);
+            if (m_listener != null) m_listener.onStateChange(mState);
         }
-        /**
-         * @return The angle of the unit circle with the image view's center
-         */
-        private double getAngle(double xTouch, double yTouch) {
-            double x = xTouch - (getWidth() / 2d);
-            double y = getHeight() - yTouch - (getHeight() / 2d);
+        return true;
+    }
+    public void setRotorPosAngle(float deg) {
 
-            switch (getQuadrant(x, y)) {
-                case 1:
-                    return Math.asin(y / Math.hypot(x, y)) * 180 / Math.PI;
-                case 2:
-                    return 180 - Math.asin(y / Math.hypot(x, y)) * 180 / Math.PI;
-                case 3:
-                    return 180 + (-1 * Math.asin(y / Math.hypot(x, y)) * 180 / Math.PI);
-                case 4:
-                    return 360 + Math.asin(y / Math.hypot(x, y)) * 180 / Math.PI;
-                default:
-                    return 0;
-            }
-        }
-
-        /**
-         * @return The selected quadrant.
-         */
-        private int getQuadrant(double x, double y) {
-            if (x >= 0) {
-                return y >= 0 ? 1 : 4;
-            } else {
-                return y >= 0 ? 2 : 3;
-            }
+        if (deg >= 210 || deg <= 150) {
+            if (deg > 180) deg = deg - 360;
+            Matrix matrix=new Matrix();
+            Log.e("GTA",deg+"");//getWidth()/2, getHeight()/2);
         }
     }
+    public void setRotorPercentage(int percentage) {
+        int posDegree = percentage * 3 - 150;
+        if (posDegree < 0) posDegree = 360 + posDegree;
+        setRotorPosAngle(posDegree);
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        float x = e2.getX() / ((float) getWidth());
+        float y = e2.getY() / ((float) getHeight());
+        float rotDegrees = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
+
+        if (! Float.isNaN(rotDegrees)) {
+            // instead of getting 0-> 180, -180 0 , we go for 0 -> 360
+            float posDegrees = rotDegrees;
+            if (rotDegrees < 0) posDegrees = 360 + rotDegrees;
+
+            // deny full rotation, start start and stop point, and get a linear scale
+            if (posDegrees > 210 || posDegrees < 150) {
+                // rotate our imageview
+                setRotorPosAngle(posDegrees);
+                // get a linear scale
+                float scaleDegrees = rotDegrees + 150; // given the current parameters, we go from 0 to 300
+                // get position percent
+                int percent = (int) (scaleDegrees / 3);
+                if (m_listener != null) m_listener.onRotate(percent);
+                return true; //consumed
+            } else
+                return false;
+        } else
+            return false; // not consumed
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        return false;
+    }
+
+    public interface RoundKnobButtonListener {
+        public void onStateChange(boolean newstate) ;
+        public void onRotate(int percentage);
+    }
+    private RoundKnobButtonListener m_listener;
+    public void SetListener(RoundKnobButtonListener l) {
+        m_listener = l;
+    }
+    public void SetState(boolean state) {
+        mState = state;
+        //ivRotor.setImageBitmap(state?bmpRotorOn:bmpRotorOff);
+    }
+
     private void setupView(Context mContext, AttributeSet attrs) {
+        SetState(mState);
+        gestureDetector = new GestureDetector(mContext,this);
+
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs,
                 R.styleable.ACMeterView, 0, 0);
         try {
@@ -109,7 +152,15 @@ public class ACMeterView extends View {
         } finally {
             a.recycle();
         }
-        setOnTouchListener(new ACMeterTouchListener());
+    }
+    /**
+     * math..
+     * @param x
+     * @param y
+     * @return
+     */
+    private float cartesianToPolar(float x, float y) {
+        return (float) -Math.toDegrees(Math.atan2(x - 0.5f, y - 0.5f));
     }
 
     @Override
