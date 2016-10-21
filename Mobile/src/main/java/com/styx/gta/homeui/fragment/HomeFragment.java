@@ -1,5 +1,5 @@
 package com.styx.gta.homeui.fragment;
-
+import com.styx.gta.homeui.ui.view.ACMeterView.RoundKnobButtonListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -23,6 +23,7 @@ public class HomeFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_home, container, false);
         ACMeterView mACMeter=(ACMeterView)rootView.findViewById(R.id.donutChart);
+
         return rootView;
     }
 }

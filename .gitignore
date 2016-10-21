@@ -42,3 +42,4 @@ captures/
 
 .gitignore
 .idea/
+.idea/libraries/
