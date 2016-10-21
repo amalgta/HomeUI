@@ -9,6 +9,7 @@ import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
@@ -32,81 +33,80 @@ import com.styx.gta.homeui.R;
  */
 
 /**
-
- GTA Notes
-
-    Input Expected:
-        MinValue=2
-        MaxValue=200
-        value=100
-        radius=60
-        meterColor=COLOR
-        SweepAngle=45
-        meterValueTextColor
-
- Rules :
-    MaxValue>=CurrentValue>=MinValue
-    MinValue<MaxValue
- Constants :
-    MaxDegree=359.9f
-
- Calculation Variables:
-    ConceptualMax=(MaxValue-MinValue)
-    ConceptualMin=0
-
-    CurrentPercentageFromValue=( (CurrentValue/ConceptualMax) * 100)
-    CurrentValueFromPercentage=( ( (CurrentPercentage/100) * ConceptualMax) ) + MinValue)
-
-
-    initMaxDegree=(SweepAngle/2)
-    initMinDegree=(MaxDegree - (SweepAngle/2))
-    CurrentPercentageFromDegree=( (CurrentDegree*100) / SweepAngle)
-    CurrentConceptualDegreeFromPercentage=( (Percentage*SweepAngle) / 100)
-    CurrentRepresentationalDegree=( (initMinDegree+CurrentConceptualDegreeFromPercentage) % MaxDegree)
-
+ * GTA Notes
+ * <p>
+ * Input Expected:
+ * MinValue=2
+ * MaxValue=200
+ * value=100
+ * radius=60
+ * meterColor=COLOR
+ * SweepAngle=45
+ * meterValueTextColor
+ * <p>
+ * Rules :
+ * MaxValue>=CurrentValue>=MinValue
+ * MinValue<MaxValue
+ * Constants :
+ * MaxDegree=359.9f
+ * <p>
+ * Calculation Variables:
+ * ConceptualMax=(MaxValue-MinValue)
+ * ConceptualMin=0
+ * <p>
+ * CurrentPercentageFromValue=( (CurrentValue/ConceptualMax) * 100)
+ * CurrentValueFromPercentage=( ( (CurrentPercentage/100) * ConceptualMax) ) + MinValue)
+ * <p>
+ * <p>
+ * initMaxDegree=(SweepAngle/2)
+ * initMinDegree=(MaxDegree - (SweepAngle/2))
+ * CurrentPercentageFromDegree=( (CurrentDegree*100) / SweepAngle)
+ * CurrentConceptualDegreeFromPercentage=( (Percentage*SweepAngle) / 100)
+ * CurrentRepresentationalDegree=( (initMinDegree+CurrentConceptualDegreeFromPercentage) % MaxDegree)
  **/
 
 
-
 public class ACMeterView extends View implements OnGestureListener {
-    String TAG=getClass().getCanonicalName();
+    String TAG = getClass().getCanonicalName();
 
     //UI Dimensions
-    private float          value,minValue,maxValue;
-    private float           radius,sweepAngle;
-    private int             meterColor,meterValueTextColor;
+    private float value, minValue, maxValue;
+    private float radius, sweepAngle;
+    private int meterColor, meterValueTextColor;
 
     //Constants
-    private final float maxDegree=359.9f;
+    private final float maxDegree = 360f;
+    private final float origin = 0f; //{-90=12", 0=3" ...}
 
     //Intermediary Constants
     private float conceptualMax;
-    private float initMaxDegree,initMinDegree;
+    private float initMaxDegree, initMinDegree;
 
     //Indicatory Variables
-    private float currentOffset=0;
+    private float currentOffset = 0;
 
-    private GestureDetector 	gestureDetector;
-    private boolean 			mState = false;
-    private float 				mAngleDown , mAngleUp;
+    private GestureDetector gestureDetector;
+    private boolean mState = false;
+    private float mAngleDown, mAngleUp;
+
 
     private void initializeConstants(Context mContext, AttributeSet attrs) {
         //SetState(mState); {Can be used to implement degree/fahrenheit transformation}
 
         //Defaults
-        final float RADIUS=80.0f;
-        final float SWEEP=120.0f;
-        final float MINVALUE=0f;
-        final float MAXVALUE=100.0f;
-        final int DEFAULT_METER_COLOR=Color.BLACK;
-        final int DEFAULT_METERVALUETEXT_COLOR=Color.WHITE;
+        final float RADIUS = 80.0f;
+        final float SWEEP = 120.0f;
+        final float MINVALUE = 0f;
+        final float MAXVALUE = 100.0f;
+        final int DEFAULT_METER_COLOR = Color.BLACK;
+        final int DEFAULT_METERVALUETEXT_COLOR = Color.WHITE;
 
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs,
                 R.styleable.ACMeterView, 0, 0);
         try {
-            value = a.getFloat(R.styleable.ACMeterView_value,((MINVALUE+MAXVALUE)/2));
-            minValue = a.getFloat(R.styleable.ACMeterView_minValue,MINVALUE);
-            maxValue = a.getFloat(R.styleable.ACMeterView_maxValue,MAXVALUE);
+            value = a.getFloat(R.styleable.ACMeterView_value, ((MINVALUE + MAXVALUE) / 2));
+            minValue = a.getFloat(R.styleable.ACMeterView_minValue, MINVALUE);
+            maxValue = a.getFloat(R.styleable.ACMeterView_maxValue, MAXVALUE);
             radius = a.getDimension(R.styleable.ACMeterView_radius, RADIUS);
             sweepAngle = a.getDimension(R.styleable.ACMeterView_sweepAngle, SWEEP);
             meterColor = a.getColor(R.styleable.ACMeterView_meterColor, DEFAULT_METER_COLOR);
@@ -117,16 +117,21 @@ public class ACMeterView extends View implements OnGestureListener {
         //Validate
     }
 
-    private void initialCalculations(){
-        conceptualMax=(maxValue-minValue);
-        initMaxDegree=(sweepAngle/2);
-        initMinDegree=(maxDegree-(sweepAngle/2));
+    private void initialCalculations() {
+        conceptualMax = (maxValue - minValue);
+        initMaxDegree = (origin+sweepAngle);
+        initMinDegree = (origin);
+        Log.e(TAG, "ConceptualMax:" + conceptualMax);
+        Log.e(TAG, "initMaxDegree:" + initMaxDegree);
+        Log.e(TAG, "initMinDegree:" + initMinDegree);
+
     }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (gestureDetector.onTouchEvent(event)) {
             return true;
-        }else {
+        } else {
             return super.onTouchEvent(event);
         }
     }
@@ -149,9 +154,8 @@ public class ACMeterView extends View implements OnGestureListener {
         float x = e.getX() / ((float) getWidth());
         float y = e.getY() / ((float) getHeight());
         mAngleUp = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
-
         // if we click up the same place where we clicked down, it's just a button press
-        if (! Float.isNaN(mAngleDown) && ! Float.isNaN(mAngleUp) && Math.abs(mAngleUp-mAngleDown) < 10) {
+        if (!Float.isNaN(mAngleDown) && !Float.isNaN(mAngleUp) && Math.abs(mAngleUp - mAngleDown) < 10) {
             SetState(!mState);
             //setRotorPosAngle((mAngleDown+mAngleDown)/2);
             if (m_listener != null) m_listener.onStateChange(mState);
@@ -159,68 +163,31 @@ public class ACMeterView extends View implements OnGestureListener {
         return true;
     }
 
-    public void setRotorPosAngle(float deg) {
-
-       // if (deg >= 270 || deg <= 180) {
-         //   if (deg > 180) deg = deg - maxDegree;
-        currentOffset=deg;
-        invalidate();
-        //    currentPercentage=deg;
-            Log.e("GTA",deg+"");
-     //   }
-    }
-    public void setRotorPercentage(int percentage) {
-        int posDegree = percentage * 3 - 150;
-        if (posDegree < 0) posDegree = 360 + posDegree;
-        setRotorPosAngle(posDegree);
-    }
-
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        float x = e2.getX() / ((float) getWidth());
-        float y = e2.getY() / ((float) getHeight());
+
+        float x = (e2.getX() / ((float) getWidth()));
+        float y = (e2.getY() / ((float) getHeight()));
         float rotDegrees = cartesianToPolar(1 - x, 1 - y);
-        // 1- to correct our custom axis direction
 
-        if (! Float.isNaN(rotDegrees)) {
-            // instead of getting 0-> 180, -180 0 , we go for 0 -> 360
+        if (!Float.isNaN(rotDegrees)) {
             float posDegrees = rotDegrees;
-            if (rotDegrees < 0)
-                posDegrees = maxDegree + rotDegrees;
-
-            // deny full rotation, start start and stop point, and get a linear scale
-            //if (posDegrees > 210 || posDegrees < 150) {
-            // rotate our imageview
-
-            float percent=((posDegrees/maxDegree)*100);
-            setRotorPosAngle(getDegree(percent));
-            Log.e(TAG,"getDegree: "+getDegree(percent));
-
-            /*
-                // get a linear scale
-                float scaleDegrees = rotDegrees + 150; // given the current parameters, we go from 0 to 300
-                // get position percent
-                int percent = (int) (scaleDegrees / 3);
-                if (m_listener != null) m_listener.onRotate(percent);
-            */
-                return true; //consumed
-           // } else
-           //     return false;
+            float adjust=90f;
+            posDegrees -= origin+adjust;
+            if (rotDegrees < origin) {
+                posDegrees = maxDegree + rotDegrees - origin;
+            }
+            setRotorPosAngle(posDegrees);
+            return true;
         } else
-            return false; // not consumed
+            return false;
     }
 
-    private float getDegree(float percent){
-        Log.e(TAG,"percent: "+percent);
-        /**
-        initMaxDegree=(SweepAngle/2)
-        initMinDegree=(MaxDegree - (SweepAngle/2))
-        CurrentPercentageFromDegree=( (CurrentDegree*100) / SweepAngle)
-        CurrentConceptualDegreeFromPercentage=( (Percentage*SweepAngle) / 100)
-        CurrentRepresentationalDegree=( (initMinDegree+CurrentConceptualDegreeFromPercentage) % MaxDegree)
-         */
-        float currentConceptualDegreeFromPercentage=((percent*sweepAngle)/100);
-        return ((initMinDegree+currentConceptualDegreeFromPercentage)%maxDegree);
+    public void setRotorPosAngle(float deg) {
+        if(deg>=origin&&deg<=sweepAngle+origin) {
+            currentOffset = deg;
+            invalidate();
+        }
     }
 
     @Override
@@ -234,13 +201,17 @@ public class ACMeterView extends View implements OnGestureListener {
     }
 
     public interface RoundKnobButtonListener {
-        public void onStateChange(boolean newstate) ;
+        public void onStateChange(boolean newstate);
+
         public void onRotate(int percentage);
     }
+
     private RoundKnobButtonListener m_listener;
+
     public void SetListener(RoundKnobButtonListener l) {
         m_listener = l;
     }
+
     public void SetState(boolean state) {
         mState = state;
         //ivRotor.setImageBitmap(state?bmpRotorOn:bmpRotorOff);
@@ -249,6 +220,7 @@ public class ACMeterView extends View implements OnGestureListener {
 
     /**
      * math..
+     *
      * @param x
      * @param y
      * @return
@@ -300,10 +272,10 @@ public class ACMeterView extends View implements OnGestureListener {
     protected void onDraw(Canvas canvas) {
         actualDraw(canvas);
     }
-    void actualDraw(Canvas mCanvas){
-        float mRotationIndex=currentOffset-90;
 
-        RectF mBaseRectangle=new RectF();
+    void actualDraw(Canvas mCanvas) {
+        float mRotationIndex = (currentOffset) % maxDegree;
+        RectF mBaseRectangle = new RectF();
         float mOffset = .20f * radius;
         //Paint Setup - Base
         Paint mPaintBase = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -311,60 +283,60 @@ public class ACMeterView extends View implements OnGestureListener {
         mPaintBase.setStyle(Style.STROKE);
         mPaintBase.setStrokeCap(Paint.Cap.BUTT);
         mPaintBase.setStrokeWidth(radius / 6.0f);
-        mPaintBase.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xff2D293E,0xff252437,Shader.TileMode.CLAMP));
+        mPaintBase.setShader(new RadialGradient(getWidth() / 2, getHeight() / 2, radius - 5, 0xff2D293E, 0xff252437, Shader.TileMode.CLAMP));
 
-        mBaseRectangle.set(mOffset, mOffset, (radius*2)-mOffset, (radius*2)-mOffset);
+        mBaseRectangle.set(mOffset, mOffset, (radius * 2) - mOffset, (radius * 2) - mOffset);
         Path mBasePath = new Path();
-        mBasePath.arcTo(mBaseRectangle, 0, 359.9f, false);
-        //mBasePath.arcTo(mBaseRectangle, (290+20), (340), false);
+        mBasePath.addCircle(mBaseRectangle.centerX(), mBaseRectangle.centerY(), radius - mOffset, Path.Direction.CCW);
 
 
         //Paint Setup - Base
-        Paint mPaintCold=new Paint(Paint.ANTI_ALIAS_FLAG);
+        Paint mPaintCold = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintCold.setDither(true);
         mPaintCold.setStyle(Style.STROKE);
         mPaintCold.setStrokeCap(Paint.Cap.BUTT);
         mPaintCold.setStrokeWidth(radius / 6.0f);
-        mPaintCold.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xffFFFFFF,0xffEFEFEF,Shader.TileMode.CLAMP));
+        mPaintCold.setShader(new RadialGradient(getWidth() / 2, getHeight() / 2, radius - 5, 0xffFFFFFF, 0xffEFEFEF, Shader.TileMode.CLAMP));
 
 
         Path mColdPath = new Path();
-        mColdPath.arcTo(mBaseRectangle, initMaxDegree+mRotationIndex, 20, false);
+        mColdPath.arcTo(mBaseRectangle, origin+initMaxDegree, 20, false);
 
         //Paint Setup - Index
-        Paint mPaintIndex=new Paint(Paint.ANTI_ALIAS_FLAG);
+        Paint mPaintIndex = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintIndex.setDither(true);
         mPaintIndex.setStyle(Style.STROKE);
         mPaintIndex.setStrokeCap(Paint.Cap.BUTT);
         mPaintIndex.setStrokeWidth(radius / 6.0f);
-        mPaintIndex.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xff3D8DD4,0xff4AAAFF,Shader.TileMode.CLAMP));
+        mPaintIndex.setShader(new RadialGradient(getWidth() / 2, getHeight() / 2, radius - 5, 0xff3D8DD4, 0xff4AAAFF, Shader.TileMode.CLAMP));
 
         Path mIndexPath = new Path();
-        mIndexPath.arcTo(mBaseRectangle, 358, 2, false);
+        mIndexPath.arcTo(mBaseRectangle, 0+(origin)+mRotationIndex, 2, false);
 
 
         //Paint Setup - Warm
-        Paint mPaintWarm=new Paint(Paint.ANTI_ALIAS_FLAG);
+        Paint mPaintWarm = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintWarm.setDither(true);
         mPaintWarm.setStyle(Style.STROKE);
         mPaintWarm.setStrokeCap(Paint.Cap.BUTT);
         mPaintWarm.setStrokeWidth(radius / 6.0f);
-        mPaintWarm.setShader(new RadialGradient(getWidth()/2,getHeight()/2, radius-5,0xffF20884,0xffF20884,Shader.TileMode.CLAMP));
+        mPaintWarm.setShader(new RadialGradient(getWidth() / 2, getHeight() / 2, radius - 5, 0xffF20884, 0xffF20884, Shader.TileMode.CLAMP));
 
         Path mWarmPath = new Path();
-        mWarmPath.arcTo(mBaseRectangle, initMinDegree+mRotationIndex, 10, false);
+        mWarmPath.arcTo(mBaseRectangle, origin+initMinDegree, 10, false);
 
 
         //Canvas Draw
 
-        mCanvas.drawPath(mBasePath,mPaintBase);
-        mCanvas.drawPath(mColdPath,mPaintCold);
-        mCanvas.drawPath(mWarmPath,mPaintWarm);
-        mCanvas.drawPath(mIndexPath,mPaintIndex);
+        mCanvas.drawPath(mBasePath, mPaintBase);
+        mCanvas.drawPath(mColdPath, mPaintCold);
+        mCanvas.drawPath(mWarmPath, mPaintWarm);
+        mCanvas.drawPath(mIndexPath, mPaintIndex);
     }
-    private void init(Context context,AttributeSet attrs){
-        gestureDetector = new GestureDetector(context,this);
-        initializeConstants(context,attrs);
+
+    private void init(Context context, AttributeSet attrs) {
+        gestureDetector = new GestureDetector(context, this);
+        initializeConstants(context, attrs);
         initialCalculations();
     }
 
