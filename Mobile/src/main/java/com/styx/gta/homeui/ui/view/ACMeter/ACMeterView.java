@@ -1,4 +1,4 @@
-package com.styx.gta.homeui.ui.view;
+package com.styx.gta.homeui.ui.view.ACMeter;
 
 import android.graphics.BlurMaskFilter;
 import android.graphics.Color;
@@ -76,6 +76,7 @@ public class ACMeterView extends View implements OnGestureListener {
 
 
     private float currentOffset;
+    private int percent;
 
     private GestureDetector gestureDetector;
     private boolean mState = false;
@@ -86,7 +87,7 @@ public class ACMeterView extends View implements OnGestureListener {
 
     private void initializeConstants(Context mContext, AttributeSet attrs) {
         //SetState(mState); {Can be used to implement degree/fahrenheit transformation}
-
+        percent=0;
         //Defaults
         final float RADIUS = 80.0f;
         final float SWEEP = 120.0f;
@@ -120,10 +121,9 @@ public class ACMeterView extends View implements OnGestureListener {
         }
     }
 
-    @Override
-    public boolean onDown(MotionEvent e) {
-        float x = e.getX() / ((float) getWidth());
-        float y = e.getY() / ((float) getHeight());
+    public boolean onDown(MotionEvent event) {
+        float x = event.getX() / ((float) getWidth());
+        float y = event.getY() / ((float) getHeight());
         mAngleDown = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
         return true;
     }
@@ -135,35 +135,61 @@ public class ACMeterView extends View implements OnGestureListener {
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
+        float x = e.getX() / ((float) getWidth());
+        float y = e.getY() / ((float) getHeight());
+        mAngleUp = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
+
+        // if we click up the same place where we clicked down, it's just a button press
+        if (! Float.isNaN(mAngleDown) && ! Float.isNaN(mAngleUp) && Math.abs(mAngleUp-mAngleDown) < 10) {
+            SetState(!mState);
+            if (m_listener != null) m_listener.onStateChange(mState,percent);
+        }
         return true;
     }
 
-    @Override
+
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        float x = e2.getX() / ((float) getWidth());
+        float y = e2.getY() / ((float) getHeight());
+        float rotDegrees = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
 
-        float x = (e2.getX() / ((float) getWidth()));
-        float y = (e2.getY() / ((float) getHeight()));
-        float rotDegrees = cartesianToPolar(1 - x, 1 - y);
-
-        if (!Float.isNaN(rotDegrees)) {
+        if (! Float.isNaN(rotDegrees)) {
+            // instead of getting 0-> 180, -180 0 , we go for 0 -> 360
             float posDegrees = rotDegrees;
-            posDegrees -= adjust;
-            if (rotDegrees < adjust) {
-                posDegrees = 360 + rotDegrees - adjust;
-            }
-            setRotorPosAngle(posDegrees);
-            return true;
+            if (rotDegrees < 0) posDegrees = 360 + rotDegrees;
+
+            // deny full rotation, start start and stop point, and get a linear scale
+            if (posDegrees > 210 || posDegrees < 150) {
+                // rotate our imageview
+
+                setRotorPosAngle(posDegrees);
+                // get a linear scale
+                float scaleDegrees = rotDegrees + 150; // given the current parameters, we go from 0 to 300
+                // get position percent
+                int percent = (int) (scaleDegrees / 3);
+                this.percent=percent;
+                if (m_listener != null) m_listener.onRotate(percent);
+                return true; //consumed
+            } else
+                return false;
         } else
-            return false;
+            return false; // not consumed
     }
 
 
     public void setRotorPosAngle(float deg) {
-        Log.e(TAG, "Deg " + deg);//0-360
-            currentOffset = deg;
-            invalidate();
-    }
 
+        if (deg >= 210 || deg <= 150) {
+            if (deg > 180) deg = deg - 360;
+                currentOffset=deg;
+            invalidate();
+        }
+    }
+    public void setRotorPercentage(int percentage) {
+        int posDegree = percentage * 3 - 150;
+        if (posDegree < 0) posDegree = 360 + posDegree;
+        setRotorPosAngle(posDegree);
+    }
     @Override
     public void onLongPress(MotionEvent e) {
 
@@ -175,13 +201,16 @@ public class ACMeterView extends View implements OnGestureListener {
     }
 
     public interface RoundKnobButtonListener {
-        public void onStateChange(boolean newstate);
+        public void onStateChange(boolean newstate,int percentage);
 
         public void onRotate(int percentage);
     }
 
     private RoundKnobButtonListener m_listener;
 
+    public void SetListener(RoundKnobButtonListener l) {
+        m_listener = l;
+    }
 
     public void SetState(boolean state) {
         mState = state;
@@ -271,7 +300,7 @@ public class ACMeterView extends View implements OnGestureListener {
 
 
         Path mColdPath = new Path();
-        mColdPath.arcTo(mBaseRectangle, -20, 20, false);
+        mColdPath.arcTo(mBaseRectangle, 102f, 20, false);
 
         //Paint Setup - Index
         Paint mPaintIndex = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -282,7 +311,7 @@ public class ACMeterView extends View implements OnGestureListener {
         mPaintIndex.setShader(new RadialGradient(getWidth() / 2, getHeight() / 2, radius - 5, 0xff3D8DD4, 0xff4AAAFF, Shader.TileMode.CLAMP));
 
         Path mIndexPath = new Path();
-        mIndexPath.arcTo(mBaseRectangle, mRotationIndex, 2, false);
+        mIndexPath.arcTo(mBaseRectangle, 0f+mRotationIndex-adjust, 2, false);
 
 
         //Paint Setup - Warm
@@ -294,7 +323,7 @@ public class ACMeterView extends View implements OnGestureListener {
         mPaintWarm.setShader(new RadialGradient(getWidth() / 2, getHeight() / 2, radius - 5, 0xffF20884, 0xffF20884, Shader.TileMode.CLAMP));
 
         Path mWarmPath = new Path();
-        mWarmPath.arcTo(mBaseRectangle, sweepAngle, 10, false);
+        mWarmPath.arcTo(mBaseRectangle, 0f+(sweepAngle/2), 10, false);
 
 
         //Canvas Draw
@@ -303,11 +332,13 @@ public class ACMeterView extends View implements OnGestureListener {
         mCanvas.drawPath(mColdPath, mPaintCold);
         mCanvas.drawPath(mWarmPath, mPaintWarm);
         mCanvas.drawPath(mIndexPath, mPaintIndex);
+
     }
 
     private void init(Context context, AttributeSet attrs) {
         gestureDetector = new GestureDetector(context, this);
         initializeConstants(context, attrs);
+        setRotorPercentage(0);
     }
 
     public ACMeterView(Context context, AttributeSet attrs) {
