@@ -1,5 +1,6 @@
 package com.styx.gta.homeui;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -10,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.styx.gta.homeui.fragment.HomeFragment;
 import com.styx.gta.homeui.ui.transformers.ZoomOutPageTransformer;
 
