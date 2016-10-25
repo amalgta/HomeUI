@@ -15,11 +15,13 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.crash.FirebaseCrash;
 
 public class SplashScreen extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
     private FirebaseAuth mAuth;
@@ -27,6 +29,13 @@ public class SplashScreen extends AppCompatActivity implements GoogleApiClient.O
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
 
+    void init(){
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "ASD");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "asdasd");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +65,8 @@ public class SplashScreen extends AppCompatActivity implements GoogleApiClient.O
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+        FirebaseCrash.report(new Exception("My first Android non-fatal error"));
+
         signIn();
     }
     @Override
