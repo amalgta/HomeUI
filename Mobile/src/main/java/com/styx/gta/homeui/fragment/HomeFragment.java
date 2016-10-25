@@ -39,12 +39,6 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_home, container, false);
-//        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
-//        Bundle params = new Bundle();
-//        params.putString( FirebaseAnalytics.Param.ITEM_ID, "Name" );
-//        params.putString( FirebaseAnalytics.Param.ITEM_CATEGORY, "icon" );
-//        params.putLong( FirebaseAnalytics.Param.VALUE,2 );
-//        mFirebaseAnalytics.logEvent("APP_START",params);
 
         mACMeter = (ACMeterView) rootView.findViewById(R.id.donutChart);
         mPercentage=(FontTextView)rootView.findViewById(R.id.percent) ;
