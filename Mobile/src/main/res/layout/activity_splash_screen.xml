@@ -7,5 +7,27 @@
     android:fitsSystemWindows="true"
     tools:context="com.styx.gta.homeui.SplashScreen">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:text="Login" />
+
+        <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Welcome, Please Login"
+            app:font="@string/regular_font_ext" />
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

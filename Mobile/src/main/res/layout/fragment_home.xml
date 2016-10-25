@@ -24,6 +24,19 @@
         android:id="@+id/percent"
         android:textSize="16sp"
         android:textAlignment="center"
-     />
+        />
+
+    <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OFF"
+        app:font="@string/regular_font_ext"
+        android:textColor="@color/textPrimary"
+        android:layout_below="@+id/percent"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/log"
+        android:textSize="16sp"
+        android:textAlignment="center"
+        />
 
 </RelativeLayout>

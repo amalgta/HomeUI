@@ -1,6 +1,8 @@
 package com.styx.gta.homeui;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -10,8 +12,12 @@ import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.styx.gta.homeui.fragment.HomeFragment;
 import com.styx.gta.homeui.ui.transformers.ZoomOutPageTransformer;
 
@@ -32,6 +38,7 @@ public class MainActivity extends FragmentActivity {
      * The pager adapter, which provides the pages to the view_acmeterview_background pager widget.
      */
     private PagerAdapter mPagerAdapter;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,16 @@ public class MainActivity extends FragmentActivity {
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+
+        button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(MainActivity.this, SplashScreen.class));
+                finish();
+            }
+        });
     }
 
     @Override

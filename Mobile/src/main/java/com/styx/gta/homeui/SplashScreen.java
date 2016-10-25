@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -22,30 +23,25 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.FirebaseDatabase;
+import com.styx.gta.homeui.model.User;
 
-public class SplashScreen extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
-    private FirebaseAuth mAuth;
+public class SplashScreen extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    ;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
 
-    void init(){
-        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "ASD");
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "asdasd");
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
-
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -53,6 +49,11 @@ public class SplashScreen extends AppCompatActivity implements GoogleApiClient.O
                 if (user != null) {
                     // User is signed in
                     Log.d("GTA", "onAuthStateChanged:signed_in:" + user.getUid());
+
+                    mFirebaseDatabase.getReference().child("user").child(user.getUid()).setValue(new User(user.getProviderId(), user.getDisplayName(), user.getEmail()));
+
+                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                    finish();
                 } else {
                     // User is signed out
                     Log.d("GTA", "onAuthStateChanged:signed_out");
@@ -65,10 +66,22 @@ public class SplashScreen extends AppCompatActivity implements GoogleApiClient.O
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        FirebaseCrash.report(new Exception("My first Android non-fatal error"));
-
-        signIn();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // User is signed in
+            Log.d("GTA", "onAuthStateChanged:signed_in:" + user.getUid());
+            mFirebaseDatabase.getReference().child("user").child(user.getUid()).setValue(new User(user.getProviderId(), user.getDisplayName(), user.getEmail()));
+            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+            finish();
+        }
+        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signIn();
+            }
+        });
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -82,10 +95,9 @@ public class SplashScreen extends AppCompatActivity implements GoogleApiClient.O
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d("GTA"
 
-                , "firebaseAuthWithGoogle:" + acct.getId());
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d("GTA", "firebaseAuthWithGoogle:" + acct.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
@@ -106,6 +118,7 @@ public class SplashScreen extends AppCompatActivity implements GoogleApiClient.O
                     }
                 });
     }
+
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);

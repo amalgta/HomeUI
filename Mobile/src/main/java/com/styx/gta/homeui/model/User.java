@@ -7,8 +7,21 @@ import com.google.firebase.database.IgnoreExtraProperties;
  */
 @IgnoreExtraProperties
 public class User {
-    public long userId;
-    public String userName;
-    public String fullName;
+    public String providerID;
+    public String displayName;
+    public String email;
+
+    public User() {
+    }
+
+    public User(String providerID, String displayName, String email) {
+        this.providerID = providerID;
+        this.displayName = displayName;
+        this.email = email;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
+    }
 
 }
