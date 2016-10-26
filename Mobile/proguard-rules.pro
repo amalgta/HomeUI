@@ -16,3 +16,5 @@
 #   public *;
 #}
 -printmapping mapping.txt
+-keepattributes Signature
+-keepattributes *Annotation*

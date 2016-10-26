@@ -31,7 +31,6 @@ import java.util.ArrayList;
 
 public class SplashScreen extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    ;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
     private static final int RC_SIGN_IN = 9001;
