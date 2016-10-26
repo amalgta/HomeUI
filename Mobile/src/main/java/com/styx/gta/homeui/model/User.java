@@ -2,14 +2,17 @@ package com.styx.gta.homeui.model;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.ArrayList;
+
 /**
  * Created by amal.george on 25-10-2016.
  */
 @IgnoreExtraProperties
 public class User {
-    public String providerID;
-    public String displayName;
-    public String email;
+    private String providerID;
+    private String displayName;
+    private String email;
+    private ArrayList<ThermoStat> userThermoStats;
 
     public User() {
     }
@@ -19,7 +22,9 @@ public class User {
         this.displayName = displayName;
         this.email = email;
     }
-
+    public void setThermostats(ArrayList<ThermoStat> userThermoStats){
+        this.userThermoStats=userThermoStats;
+    }
     public String getDisplayName() {
         return this.displayName;
     }

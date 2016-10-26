@@ -24,7 +24,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.FirebaseDatabase;
+import com.styx.gta.homeui.model.ThermoStat;
 import com.styx.gta.homeui.model.User;
+
+import java.util.ArrayList;
 
 public class SplashScreen extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -66,14 +69,7 @@ public class SplashScreen extends AppCompatActivity implements GoogleApiClient.O
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            // User is signed in
-            Log.d("GTA", "onAuthStateChanged:signed_in:" + user.getUid());
-            mFirebaseDatabase.getReference().child("user").child(user.getUid()).setValue(new User(user.getProviderId(), user.getDisplayName(), user.getEmail()));
-            startActivity(new Intent(SplashScreen.this, MainActivity.class));
-            finish();
-        }
+
         findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,7 +101,20 @@ public class SplashScreen extends AppCompatActivity implements GoogleApiClient.O
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d("GTA", "signInWithCredential:onComplete:" + task.isSuccessful());
-
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            // User is signed in
+                            User mUser=new User(user.getProviderId(), user.getDisplayName(), user.getEmail());
+                            Log.e("GTA", "onAuthStateChanged:signed_in:" + user.getUid());
+                            mFirebaseDatabase.getReference().child("user").child(user.getUid()).child("ASDASD").setValue("Asdad");
+                            mFirebaseDatabase.getReference().child("user").child(user.getUid()).child("ThermoStats").setValue(new ThermoStat("t1",1));
+                            mFirebaseDatabase.getReference().child("user").child(user.getUid()).child("ThermoStats").setValue(new ThermoStat("t2",1));
+                            mFirebaseDatabase.getReference().child("user").child(user.getUid()).child("ThermoStats").setValue(new ThermoStat("t3",1));
+                            mFirebaseDatabase.getReference().child("user").child(user.getUid()).child("ThermoStats").setValue(new ThermoStat("t4",1));
+                            mFirebaseDatabase.getReference().child("user").child(user.getUid()).child("ThermoStats").setValue(new ThermoStat("t5",1));
+                            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                            finish();
+                        }
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.

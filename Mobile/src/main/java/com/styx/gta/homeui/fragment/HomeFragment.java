@@ -50,6 +50,22 @@ public class HomeFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
 
+        mACMeter.SetListener(new ACMeterView.RoundKnobButtonListener() {
+            @Override
+            public void onStateChange(boolean newstate, int percentage) {
+                if (newstate) {
+                    myRef.setValue("OFF");
+                } else {
+                    this.onRotate(percentage);
+                }
+            }
+
+            @Override
+            public void onRotate(int percentage) {
+                myRef.setValue(percentage);
+            }
+        });
+
         mFirebaseDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -62,39 +78,22 @@ public class HomeFragment extends Fragment {
 
             }
         });
-        mACMeter.SetListener(new ACMeterView.RoundKnobButtonListener() {
-            @Override
-            public void onStateChange(boolean newstate, int percentage) {
-                if (newstate) {
-                    mPercentage.setText("OFF");
-                } else {
-                    this.onRotate(percentage);
 
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String data = dataSnapshot.getValue().toString();
+                if(data!="OFF") {
+                    mACMeter.setRotorPercentage(Integer.parseInt(data));
+                    mPercentage.setText(data + "%");
+                }else {
+                    mPercentage.setText(data);
                 }
             }
 
             @Override
-            public void onRotate(int percentage) {
-                mPercentage.setText(String.valueOf(percentage) + "%");
-                myRef.setValue(percentage);
-            }
-        });
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                String data = dataSnapshot.getValue().toString();
-                mACMeter.setRotorPercentage(Integer.parseInt(data));
-                mPercentage.setText(data + "%");
-
-                // ...
-            }
-
-            @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                // ...
             }
         };
         myRef.addValueEventListener(postListener);
