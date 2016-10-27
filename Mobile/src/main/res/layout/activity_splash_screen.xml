@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.styx.gta.homeui.SplashScreenActivity">
+    tools:context="com.styx.gta.homeui.LoginActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -74,13 +74,13 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/buttonRegister"
+                    android:id="@+id/buttonSignup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Register" />
 
                 <Button
-                    android:id="@+id/buttonLogin"
+                    android:id="@+id/buttonSignin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Login" />
@@ -95,7 +95,7 @@
             android:layout_centerHorizontal="true">
 
             <com.google.android.gms.common.SignInButton
-                android:id="@+id/googleSignin"
+                android:id="@+id/buttonGoogleSignIn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp" />

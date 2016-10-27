@@ -32,9 +32,9 @@ import static android.content.ContentValues.TAG;
  */
 
 public class HomeFragment extends BaseFragment {
-    String TAG = "HomeFragment";
     ACMeterView mACMeter;
     FontTextView mPercentage;
+
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("message");
 

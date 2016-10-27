@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -13,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,23 +36,31 @@ import com.styx.gta.homeui.util.Constants;
 
 import java.util.ArrayList;
 
-public class SplashScreenActivity extends BaseAppCompatActivity {
-    private GoogleApiClient mGoogleApiClient;
+public class LoginActivity extends BaseAppCompatActivity implements View.OnClickListener {
 
-    void init() {
-    }
+    private EditText editTextEmail;
+    private EditText editTextPassword;
+    private Button buttonSignup;
+    private Button buttonSignin;
+    private SignInButton buttonGoogleSignIn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        init();
+        DEBUG = true;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
-        findViewById(R.id.googleSignin).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signIn();
-            }
-        });
+
+        editTextEmail = (EditText) findViewById(R.id.editTextEmail);
+        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
+        buttonSignup = (Button) findViewById(R.id.buttonSignup);
+        buttonSignin = (Button) findViewById(R.id.buttonSignin);
+        buttonGoogleSignIn = (SignInButton) findViewById(R.id.buttonGoogleSignIn);
+
+        buttonSignup.setOnClickListener(this);
+        buttonSignin.setOnClickListener(this);
+        buttonGoogleSignIn.setOnClickListener(this);
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
@@ -69,13 +81,82 @@ public class SplashScreenActivity extends BaseAppCompatActivity {
                 });
     }
 
-    private void signIn() {
+    private void signUpWithEmail() {
+        debug("signUp");
+        if (!validateForm()) {
+            return;
+        }
         showProgressDialog();
+        String email = editTextEmail.getText().toString();
+        String password = editTextPassword.getText().toString();
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        debug("createUser:onComplete:" + task.isSuccessful());
+                        hideProgressDialog();
+                        if (task.isSuccessful()) {
+                            onAuthSuccess(task.getResult().getUser());
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Sign Up Failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void signInWithEmail() {
+        debug("signIn");
+        if (!validateForm()) {
+            return;
+        }
+        showProgressDialog();
+        String email = editTextEmail.getText().toString();
+        String password = editTextPassword.getText().toString();
+
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        debug("signIn:onComplete:" + task.isSuccessful());
+                        hideProgressDialog();
+
+                        if (task.isSuccessful()) {
+                            onAuthSuccess(task.getResult().getUser());
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Sign In Failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private boolean validateForm() {
+        boolean result = true;
+        if (TextUtils.isEmpty(editTextEmail.getText().toString())) {
+            editTextEmail.setError("Required");
+            result = false;
+        } else {
+            editTextEmail.setError(null);
+        }
+
+        if (TextUtils.isEmpty(editTextPassword.getText().toString())) {
+            editTextPassword.setError("Required");
+            result = false;
+        } else {
+            editTextPassword.setError(null);
+        }
+
+        return result;
+    }
+
+    private void signInWithGoogle() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
@@ -120,4 +201,18 @@ public class SplashScreenActivity extends BaseAppCompatActivity {
         }
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.buttonSignup:
+                signUpWithEmail();
+                break;
+            case R.id.buttonSignin:
+                signInWithEmail();
+                break;
+            case R.id.buttonGoogleSignIn:
+                signInWithGoogle();
+                break;
+        }
+    }
 }
