@@ -26,15 +26,21 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.styx.gta.homeui.base.BaseAppCompatActivity;
 import com.styx.gta.homeui.model.ThermoStat;
 import com.styx.gta.homeui.model.User;
 import com.styx.gta.homeui.util.Constants;
+import com.styx.gta.homeui.util.Util;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class LoginActivity extends BaseAppCompatActivity implements View.OnClickListener {
 
@@ -43,7 +49,6 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     private Button buttonSignup;
     private Button buttonSignin;
     private SignInButton buttonGoogleSignIn;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +69,10 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        debug("firebaseAuthWithGoogle");
+
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
+        getmAuth().signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -90,7 +97,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         String email = editTextEmail.getText().toString();
         String password = editTextPassword.getText().toString();
 
-        mAuth.createUserWithEmailAndPassword(email, password)
+        getmAuth().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -115,7 +122,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         String email = editTextEmail.getText().toString();
         String password = editTextPassword.getText().toString();
 
-        mAuth.signInWithEmailAndPassword(email, password)
+        getmAuth().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -137,8 +144,16 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         if (TextUtils.isEmpty(editTextEmail.getText().toString())) {
             editTextEmail.setError("Required");
             result = false;
+
         } else {
-            editTextEmail.setError(null);
+            String regex = "^(.+)@(.+)$";
+            String test = editTextEmail.getText().toString();
+            if (!test.matches(regex)) {
+                editTextEmail.setError("Invalid Email");
+                result = false;
+            } else {
+                editTextEmail.setError(null);
+            }
         }
 
         if (TextUtils.isEmpty(editTextPassword.getText().toString())) {
@@ -152,6 +167,8 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     }
 
     private void signInWithGoogle() {
+        debug("signInWithGoogle");
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -165,23 +182,41 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     }
 
     private void onAuthSuccess(FirebaseUser user) {
-        //  String username = usernameFromEmail(user.getEmail());
+        debug("onAuthSuccess");
+        final FirebaseUser mUser=user;
+        getmDatabase().child("user").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    debug("USER EXISTS");
+                } else {
+                    writeNewUser(mUser);
+                    debug("USER NOT EXISTS");
+                }
+                debug("INTENT STARTED TO MAINACTIVITY");
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                finish();
+            }
 
-        // Write new user
-        // writeNewUser(user.getUid(), username, user.getEmail());
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+            }
+        });
 
-        // Go to MainActivity
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-        finish();
     }
+    private void writeNewUser(FirebaseUser mUser) {
+        debug("writeNewUser");
 
+        User user = new User(mUser.getProviderId(),Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
+        getmDatabase().child("user").child(mUser.getUid()).setValue(user);
+    }
     @Override
     public void onStart() {
         super.onStart();
 
         // Check auth on Activity start
-        if (mAuth.getCurrentUser() != null) {
-            onAuthSuccess(mAuth.getCurrentUser());
+        if (getmAuth().getCurrentUser() != null) {
+            onAuthSuccess(getmAuth().getCurrentUser());
         }
     }
 

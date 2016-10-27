@@ -7,7 +7,13 @@ import com.google.firebase.auth.FirebaseUser;
  */
 
 public abstract class Util {
+    public static String usernameFromEmail(String email) {
+        if (email.contains("@")) {
+            return email.split("@")[0];
+        } else {
+            return email;
+        }
+    }
     public void isLoggedIn(){
-
     }
 }

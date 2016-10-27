@@ -22,9 +22,6 @@ public class User {
         this.displayName = displayName;
         this.email = email;
     }
-    public void setThermostats(ArrayList<ThermoStat> userThermoStats){
-        this.userThermoStats=userThermoStats;
-    }
     public String getDisplayName() {
         return this.displayName;
     }

@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.styx.gta.homeui.MainActivity;
 import com.styx.gta.homeui.R;
 import com.styx.gta.homeui.base.BaseFragment;
 import com.styx.gta.homeui.model.User;
@@ -65,8 +66,7 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
-        DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
-        mFirebaseDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        getmDatabase().child("user").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User mUser = dataSnapshot.getValue(User.class);
@@ -83,10 +83,10 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue().toString();
-                if(!data.equals("OFF")) {
+                if (!data.equals("OFF")) {
                     mACMeter.setRotorPercentage(Integer.parseInt(data));
                     mPercentage.setText(data + "%");
-                }else {
+                } else {
                     mPercentage.setText(data);
                 }
             }

@@ -23,8 +23,8 @@ public class BaseAppCompatActivity extends FragmentActivity implements GoogleApi
     protected String TAG;
     protected boolean DEBUG;
 
-    protected DatabaseReference mDatabase;
-    protected FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
 
     private ProgressDialog mProgressDialog;
 
@@ -33,12 +33,19 @@ public class BaseAppCompatActivity extends FragmentActivity implements GoogleApi
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
+    public DatabaseReference getmDatabase() {
+        return mDatabase;
+    }
+
+    public FirebaseAuth getmAuth() {
+        return mAuth;
+    }
 
     protected BaseAppCompatActivity() {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         TAG = this.getClass().getCanonicalName();
-        DEBUG = true;
+        DEBUG = false;
     }
 
     protected void debug(String mLogText) {

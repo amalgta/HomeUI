@@ -17,13 +17,19 @@
             android:layout_centerInParent="true"
             android:layout_margin="10dp"
             android:orientation="vertical">
-
+            <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Login / Register"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                app:font="@string/regular_font_ext" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="10dp"
-                android:weightSum="2">
+                android:weightSum="3">
 
                 <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
                     android:layout_width="0dp"
@@ -37,7 +43,7 @@
                     android:id="@+id/editTextEmail"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:elevation="10dp"
                     android:inputType="textEmailAddress" />
             </LinearLayout>
@@ -47,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="10dp"
-                android:weightSum="2">
+                android:weightSum="3">
 
                 <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
                     android:layout_width="0dp"
@@ -61,7 +67,7 @@
                     android:id="@+id/editTextPassword"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:elevation="10dp"
                     android:inputType="textPassword" />
             </LinearLayout>
