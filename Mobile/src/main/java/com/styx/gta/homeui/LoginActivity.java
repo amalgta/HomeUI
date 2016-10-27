@@ -55,6 +55,11 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         DEBUG = true;
 
         super.onCreate(savedInstanceState);
+
+        if (getmAuth().getCurrentUser() != null) {
+            onAuthSuccess(getmAuth().getCurrentUser());
+        }
+
         setContentView(R.layout.activity_splash_screen);
 
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
@@ -68,15 +73,13 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         buttonGoogleSignIn.setOnClickListener(this);
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithCredential(AuthCredential credential) {
         debug("firebaseAuthWithGoogle");
-
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        hideProgressDialog();
         getmAuth().signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        hideProgressDialog();
                         if (task.isSuccessful()) {
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             onAuthSuccess(user);
@@ -84,6 +87,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
                             Toast.makeText(getApplicationContext(), "Sign In Failed",
                                     Toast.LENGTH_SHORT).show();
                         }
+
                     }
                 });
     }
@@ -168,6 +172,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
 
     private void signInWithGoogle() {
         debug("signInWithGoogle");
+        showProgressDialog();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -181,9 +186,34 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         startActivityForResult(signInIntent, Constants.GOOGLE_SIGN_IN);
     }
 
-    private void onAuthSuccess(FirebaseUser user) {
+    private void onAuthSuccess(final FirebaseUser user) {
         debug("onAuthSuccess");
-        final FirebaseUser mUser=user;
+        if(getmAuth().getCurrentUser()!=null){
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            finish();
+        }else{
+            getmDatabase().child("user").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        debug("USER EXISTS");
+                    } else {
+                        writeNewUser(user);
+                        debug("USER NOT EXISTS");
+                    }
+                    debug("INTENT STARTED TO MAINACTIVITY");
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    finish();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError firebaseError) {
+                }
+            });
+        }
+
+        /*
+        final FirebaseUser mUser = user;
         getmDatabase().child("user").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -202,22 +232,18 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
             public void onCancelled(DatabaseError firebaseError) {
             }
         });
-
+*/
     }
+
     private void writeNewUser(FirebaseUser mUser) {
         debug("writeNewUser");
-
-        User user = new User(mUser.getProviderId(),Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
+        User user = new User(mUser.getProviderId(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
         getmDatabase().child("user").child(mUser.getUid()).setValue(user);
     }
+
     @Override
     public void onStart() {
         super.onStart();
-
-        // Check auth on Activity start
-        if (getmAuth().getCurrentUser() != null) {
-            onAuthSuccess(getmAuth().getCurrentUser());
-        }
     }
 
     @Override
@@ -228,9 +254,10 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                firebaseAuthWithGoogle(account);
+                firebaseAuthWithCredential(GoogleAuthProvider.getCredential(result.getSignInAccount().getIdToken(), null));
             } else {
+                hideProgressDialog();
+                debug("ERROR GOOGLE SIGNIN GAILER");
                 // Google Sign In failed, update UI appropriately
             }
         }
