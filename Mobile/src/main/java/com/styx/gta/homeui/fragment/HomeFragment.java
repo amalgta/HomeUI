@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.styx.gta.homeui.R;
+import com.styx.gta.homeui.base.BaseFragment;
 import com.styx.gta.homeui.model.User;
 import com.styx.gta.homeui.ui.view.ACMeter.ACMeterView;
 import com.styx.gta.homeui.ui.view.FontTextView.FontTextView;
@@ -30,7 +31,7 @@ import static android.content.ContentValues.TAG;
  * Created by amal.george on 19-10-2016.
  */
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends BaseFragment {
     String TAG = "HomeFragment";
     ACMeterView mACMeter;
     FontTextView mPercentage;
@@ -47,8 +48,6 @@ public class HomeFragment extends Fragment {
         mPercentage = (FontTextView) rootView.findViewById(R.id.percent);
         final FontTextView log = (FontTextView) rootView.findViewById(R.id.log);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
 
         mACMeter.SetListener(new ACMeterView.RoundKnobButtonListener() {
             @Override
@@ -66,6 +65,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
         mFirebaseDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -83,7 +83,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue().toString();
-                if(data!="OFF") {
+                if(!data.equals("OFF")) {
                     mACMeter.setRotorPercentage(Integer.parseInt(data));
                     mPercentage.setText(data + "%");
                 }else {

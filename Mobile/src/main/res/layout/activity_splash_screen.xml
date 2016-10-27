@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.styx.gta.homeui.SplashScreen">
+    tools:context="com.styx.gta.homeui.SplashScreenActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -34,6 +34,7 @@
                     app:font="@string/regular_font_ext" />
 
                 <EditText
+                    android:id="@+id/editTextEmail"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -57,6 +58,7 @@
                     app:font="@string/regular_font_ext" />
 
                 <EditText
+                    android:id="@+id/editTextPassword"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -64,12 +66,26 @@
                     android:inputType="textPassword" />
             </LinearLayout>
 
-            <Button
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="10dp"
-                android:text="Login" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/buttonRegister"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Register" />
+
+                <Button
+                    android:id="@+id/buttonLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Login" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -79,7 +95,7 @@
             android:layout_centerHorizontal="true">
 
             <com.google.android.gms.common.SignInButton
-                android:id="@+id/button2"
+                android:id="@+id/googleSignin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp" />

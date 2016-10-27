@@ -18,10 +18,11 @@ import android.widget.Button;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
+import com.styx.gta.homeui.base.BaseAppCompatActivity;
 import com.styx.gta.homeui.fragment.HomeFragment;
 import com.styx.gta.homeui.ui.transformers.ZoomOutPageTransformer;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends BaseAppCompatActivity {
 
     /**
      * The number of pages (wizard steps) to show in this demo.
@@ -55,9 +56,7 @@ public class MainActivity extends FragmentActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(MainActivity.this, SplashScreen.class));
-                finish();
+                signOut();
             }
         });
     }
