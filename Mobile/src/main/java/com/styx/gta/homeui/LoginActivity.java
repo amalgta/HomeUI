@@ -43,7 +43,12 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class LoginActivity extends BaseAppCompatActivity implements View.OnClickListener {
-
+    // [START declare_auth]
+    private FirebaseAuth mAuth;
+    // [END declare_auth]
+    // [START declare_auth_listener]
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    // [END declare_auth_listener]
     private EditText editTextEmail;
     private EditText editTextPassword;
     private Button buttonSignup;
@@ -57,7 +62,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
 
         if (getmAuth().getCurrentUser() != null) {
-            onAuthSuccess(getmAuth().getCurrentUser());
+            isLoggedIn(getmAuth().getCurrentUser());
         }
 
         setContentView(R.layout.activity_splash_screen);
@@ -71,15 +76,23 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         buttonSignup.setOnClickListener(this);
         buttonSignin.setOnClickListener(this);
         buttonGoogleSignIn.setOnClickListener(this);
+        // [START initialize_auth]
+        mAuth = FirebaseAuth.getInstance();
+    }
+
+    private void isLoggedIn(FirebaseUser user) {
+        debug("isLoggedIn");
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        finish();
     }
 
     private void firebaseAuthWithCredential(AuthCredential credential) {
         debug("firebaseAuthWithGoogle");
-        hideProgressDialog();
         getmAuth().signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        hideProgressDialog();
                         if (task.isSuccessful()) {
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             onAuthSuccess(user);
@@ -188,10 +201,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
 
     private void onAuthSuccess(final FirebaseUser user) {
         debug("onAuthSuccess");
-        if(getmAuth().getCurrentUser()!=null){
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            finish();
-        }else{
+        if (getmAuth().getCurrentUser() != null) {
             getmDatabase().child("user").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
@@ -212,27 +222,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
             });
         }
 
-        /*
-        final FirebaseUser mUser = user;
-        getmDatabase().child("user").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    debug("USER EXISTS");
-                } else {
-                    writeNewUser(mUser);
-                    debug("USER NOT EXISTS");
-                }
-                debug("INTENT STARTED TO MAINACTIVITY");
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                finish();
-            }
 
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-            }
-        });
-*/
     }
 
     private void writeNewUser(FirebaseUser mUser) {
@@ -241,10 +231,6 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         getmDatabase().child("user").child(mUser.getUid()).setValue(user);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -70,6 +70,7 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User mUser = dataSnapshot.getValue(User.class);
+                debug("POP");
                 log.setText(mUser.getDisplayName());
             }
 
