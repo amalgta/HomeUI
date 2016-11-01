@@ -111,6 +111,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
             return;
         }
         showProgressDialog();
+        //Test
         String email = editTextEmail.getText().toString();
         String password = editTextPassword.getText().toString();
 
