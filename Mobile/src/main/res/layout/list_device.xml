@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="4">
+
     <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:id="@+id/textViewDeviceID"
         android:text="Device ID"
         android:textAlignment="center"
         app:font="@string/regular_font_ext" />
@@ -14,14 +18,27 @@
     <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:id="@+id/textViewDeviceName"
         android:text="Device Name"
         android:textAlignment="center"
         app:font="@string/regular_font_ext" />
 
     <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Device Value"
-            android:textAlignment="center"
-            app:font="@string/regular_font_ext" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewDeviceValue"
+        android:layout_weight="1"
+        android:text="Device Value"
+        android:textAlignment="center"
+        app:font="@string/regular_font_ext" />
+
+    <Button
+        android:id="@+id/buttonRemove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="R"
+        android:visibility="gone"
+        android:theme="@style/YourApplicationTheme" />
 </LinearLayout>

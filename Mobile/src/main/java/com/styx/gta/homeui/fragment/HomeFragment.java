@@ -81,8 +81,7 @@ public class HomeFragment extends BaseFragment {
 
             }
         });
-
-        ValueEventListener postListener = new ValueEventListener() {
+        myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue().toString();
@@ -98,8 +97,7 @@ public class HomeFragment extends BaseFragment {
             public void onCancelled(DatabaseError databaseError) {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
             }
-        };
-        myRef.addValueEventListener(postListener);
+        });
         return rootView;
     }
 }

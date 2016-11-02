@@ -8,12 +8,13 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class ThermoStat {
     private String thermostatID;
+    private String thermostatName;
     private int thermostatValue;
     public ThermoStat(){
 
     }
-    public ThermoStat(String thermostatID,int thermostatValue){
-        this.thermostatID=thermostatID;
+    public ThermoStat(String thermostatName,int thermostatValue){
+        this.thermostatName=thermostatName;
         this.thermostatValue=thermostatValue;
     }
     public void setThermostatID(String thermostatID) {
@@ -27,8 +28,12 @@ public class ThermoStat {
     public String getThermostatID() {
         return thermostatID;
     }
+    public String thermostatName() {
+        return thermostatName;
+    }
 
     public void setThermostatValue(int thermostatValue) {
         this.thermostatValue = thermostatValue;
     }
+
 }
