@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.styx.gta.homeui.AddDeviceActivity;
 import com.styx.gta.homeui.LoginActivity;
 
 /**
@@ -77,6 +78,7 @@ public class BaseAppCompatActivity extends FragmentActivity implements GoogleApi
         startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         finish();
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {

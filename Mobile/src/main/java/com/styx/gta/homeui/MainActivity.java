@@ -39,7 +39,7 @@ public class MainActivity extends BaseAppCompatActivity {
      * The pager adapter, which provides the pages to the view_acmeterview_background pager widget.
      */
     private PagerAdapter mPagerAdapter;
-    private Button button;
+    private Button buttonSignout, buttonAddDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +52,25 @@ public class MainActivity extends BaseAppCompatActivity {
         mPager.setAdapter(mPagerAdapter);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
-        button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
+        buttonSignout = (Button) findViewById(R.id.buttonSignout);
+        buttonAddDevice = (Button) findViewById(R.id.buttonAddDevice);
+
+        buttonSignout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 signOut();
             }
         });
+        buttonAddDevice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addDevice();
+            }
+        });
     }
-
+    protected void addDevice() {
+        startActivity(new Intent(getApplicationContext(), AddDeviceActivity.class));
+    }
     @Override
     public void onBackPressed() {
         if (mPager.getCurrentItem() == 0) {

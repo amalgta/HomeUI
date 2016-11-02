@@ -12,7 +12,6 @@ public class User {
     private String providerID;
     private String displayName;
     private String email;
-    private ArrayList<ThermoStat> userThermoStats;
 
     public User() {
     }
