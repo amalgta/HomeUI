@@ -47,7 +47,16 @@ public class HomeFragment extends BaseFragment {
         mDevices.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                textViewDeviceStatus.setText(dataSnapshot.getChildrenCount() + " devices configured.");
+                if (dataSnapshot.getChildrenCount() == 0) {
+                    buttonManageDevice.setVisibility(View.INVISIBLE);
+                    textViewDeviceStatus.setText("No configured device.");
+                } else if (dataSnapshot.getChildrenCount() == 1) {
+                    buttonManageDevice.setVisibility(View.VISIBLE);
+                    textViewDeviceStatus.setText(dataSnapshot.getChildrenCount() + " device configured.");
+                } else if (dataSnapshot.getChildrenCount() > 1) {
+                    textViewDeviceStatus.setText(dataSnapshot.getChildrenCount() + " devices configured.");
+                    buttonManageDevice.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
