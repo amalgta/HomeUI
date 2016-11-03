@@ -12,10 +12,8 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.styx.gta.homeui.MainActivity;
 
-public class BaseFragment extends Fragment {
+public class BaseFragment extends Fragment{
     protected FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     protected String TAG;
     protected boolean DEBUG;

@@ -4,37 +4,11 @@
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-        <com.styx.gta.homeui.ui.view.ACMeter.ACMeterView
-        android:id="@+id/donutChart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:radius="150dp"
-        android:layout_gravity="center"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
     <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="Device"
         app:font="@string/regular_font_ext"
-        android:textColor="@color/textPrimary"
-        android:layout_below="@+id/donutChart"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/percent"
-        android:textSize="16sp"
-        android:textAlignment="center"
-        />
-
-    <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:font="@string/regular_font_ext"
-        android:textColor="@color/textPrimary"
-        android:layout_below="@+id/percent"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/log"
-        android:textSize="16sp"
-        android:textAlignment="center"
-        />
-
+        android:textAlignment="center" />
 </RelativeLayout>

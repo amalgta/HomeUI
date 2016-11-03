@@ -1,60 +1,52 @@
 package com.styx.gta.homeui.fragment;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.styx.gta.homeui.MainActivity;
 import com.styx.gta.homeui.R;
 import com.styx.gta.homeui.base.BaseFragment;
 import com.styx.gta.homeui.model.ThermoStat;
-import com.styx.gta.homeui.model.User;
 import com.styx.gta.homeui.ui.view.ACMeter.ACMeterView;
 import com.styx.gta.homeui.ui.view.FontTextView.FontTextView;
+import com.styx.gta.homeui.util.Constants;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.analytics.FirebaseAnalytics.Event;
-import com.google.firebase.analytics.FirebaseAnalytics.Param;
-
-import static android.content.ContentValues.TAG;
+import static com.styx.gta.homeui.util.Constants.DEVICE;
+import static com.styx.gta.homeui.util.Constants.USER;
 
 /**
  * Created by amal.george on 19-10-2016.
  */
 
-public class HomeFragment extends BaseFragment {
+public class DeviceFragment extends BaseFragment {
     ACMeterView mACMeter;
     FontTextView mPercentage;
     String mObjectId;
     DatabaseReference myRef;
-    public HomeFragment(){
-        mObjectId="-KVcwmPQGVqPC1Jbb9_Y";
+
+    public DeviceFragment() {
+        mObjectId = "-KVcwmPQGVqPC1Jbb9_Y";
     }
-    public void setBundle(Bundle mBundle){
-        mObjectId=(String)mBundle.get("ObjectID");
+
+    public void setBundle(Bundle mBundle) {
+        mObjectId = (String) mBundle.get("ObjectID");
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.fragment_home, container, false);
-        myRef=getmDatabase().child("user").child(getmAuth().getCurrentUser().getUid()).child("device").child(mObjectId);
+                R.layout.fragment_device, container, false);
+        myRef = getmDatabase().child(USER).child(getmAuth().getCurrentUser().getUid()).child(DEVICE).child(mObjectId);
         mACMeter = (ACMeterView) rootView.findViewById(R.id.donutChart);
         mPercentage = (FontTextView) rootView.findViewById(R.id.percent);
         final FontTextView log = (FontTextView) rootView.findViewById(R.id.log);
-
 
         mACMeter.SetListener(new ACMeterView.RoundKnobButtonListener() {
             @Override
@@ -68,7 +60,7 @@ public class HomeFragment extends BaseFragment {
 
             @Override
             public void onRotate(int percentage) {
-                myRef.child("thermostatValue").setValue(percentage+"");
+                myRef.child("thermostatValue").setValue(percentage + "");
             }
         });
 
@@ -76,8 +68,8 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 try {
-                    ThermoStat mThermoStat= dataSnapshot.getValue(ThermoStat.class);
-                    Log.e("GTA",dataSnapshot.toString());
+                    ThermoStat mThermoStat = dataSnapshot.getValue(ThermoStat.class);
+                    Log.e("GTA", dataSnapshot.toString());
                     log.setText(mThermoStat.getThermostatName());
                     if (!mThermoStat.getThermostatValue().equals("OFF")) {
                         mACMeter.setRotorPercentage(Integer.parseInt(mThermoStat.getThermostatValue()));
@@ -85,7 +77,7 @@ public class HomeFragment extends BaseFragment {
                     } else {
                         mPercentage.setText(mThermoStat.getThermostatValue());
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
