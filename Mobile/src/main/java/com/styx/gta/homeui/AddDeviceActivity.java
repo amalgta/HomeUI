@@ -1,6 +1,7 @@
 package com.styx.gta.homeui;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,6 +46,20 @@ public class AddDeviceActivity extends BaseAppCompatActivity {
         recyclerView.setAdapter(mAdapter);
         prepareMovieData();
 
+        View.OnClickListener mClickListener=new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()){
+                    case R.id.buttonAdd:
+                        DatabaseReference mChild=getmDatabase().child("user").child(getUid()).child("device").push();
+                        ThermoStat mThermoStat=new ThermoStat(((EditText)findViewById(R.id.editTextDeviceName)).getText().toString(),(((EditText)findViewById(R.id.editTextDeviceValue)).getText().toString()));
+                        mThermoStat.setThermostatID(mChild.getKey());
+                        mChild.setValue(mThermoStat);
+                        break;
+                }
+            }
+        };
+        findViewById(R.id.buttonAdd).setOnClickListener(mClickListener);
 
     }
 
@@ -51,11 +67,16 @@ public class AddDeviceActivity extends BaseAppCompatActivity {
         getmDatabase().child("user").child(getUid()).child("device").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                movieList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    ThermoStat mStat=postSnapshot.getValue(ThermoStat.class);
-                    mStat.setThermostatID(postSnapshot.getKey());
-                    movieList.add(mStat);
-                    mAdapter.notifyDataSetChanged();
+                    try {
+                        ThermoStat mStat=postSnapshot.getValue(ThermoStat.class);
+                        movieList.add(mStat);
+                        mAdapter.notifyDataSetChanged();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                 }
             }
 

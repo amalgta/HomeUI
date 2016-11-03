@@ -36,5 +36,40 @@
                 android:id="@+id/list_device"/>
 
         </LinearLayout>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:padding="10dp">
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/editTextDeviceName"
+                android:hint="Device Name"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textAlignment="center"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editTextDeviceValue"
+                android:layout_weight="1"
+                android:inputType="number"
+                android:hint="Device Value"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/buttonAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="A"
+                android:theme="@style/YourApplicationTheme" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

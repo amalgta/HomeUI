@@ -9,31 +9,34 @@ import com.google.firebase.database.IgnoreExtraProperties;
 public class ThermoStat {
     private String thermostatID;
     private String thermostatName;
-    private int thermostatValue;
-    public ThermoStat(){
+    private String thermostatValue;
+
+    public ThermoStat() {
 
     }
-    public ThermoStat(String thermostatName,int thermostatValue){
-        this.thermostatName=thermostatName;
-        this.thermostatValue=thermostatValue;
+
+    public ThermoStat(String thermostatName, String thermostatValue) {
+        this.thermostatName = thermostatName;
+        this.thermostatValue = thermostatValue;
     }
+
     public void setThermostatID(String thermostatID) {
         this.thermostatID = thermostatID;
     }
 
-    public int getThermostatValue() {
+    public void setThermostatName(String thermostatName) {
+        this.thermostatName = thermostatName;
+    }
+
+    public String getThermostatValue() {
         return thermostatValue;
     }
 
     public String getThermostatID() {
         return thermostatID;
     }
-    public String thermostatName() {
+
+    public String getThermostatName() {
         return thermostatName;
     }
-
-    public void setThermostatValue(int thermostatValue) {
-        this.thermostatValue = thermostatValue;
-    }
-
 }

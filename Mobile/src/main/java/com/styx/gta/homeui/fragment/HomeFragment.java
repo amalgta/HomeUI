@@ -37,16 +37,20 @@ import static android.content.ContentValues.TAG;
 public class HomeFragment extends BaseFragment {
     ACMeterView mACMeter;
     FontTextView mPercentage;
-
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myRef = database.getReference("message");
-
+    String mObjectId;
+    DatabaseReference myRef;
+    public HomeFragment(){
+        mObjectId="-KVcwmPQGVqPC1Jbb9_Y";
+    }
+    public void setBundle(Bundle mBundle){
+        mObjectId=(String)mBundle.get("ObjectID");
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_home, container, false);
-
+        myRef=getmDatabase().child("user").child(getmAuth().getCurrentUser().getUid()).child("device").child(mObjectId);
         mACMeter = (ACMeterView) rootView.findViewById(R.id.donutChart);
         mPercentage = (FontTextView) rootView.findViewById(R.id.percent);
         final FontTextView log = (FontTextView) rootView.findViewById(R.id.log);
@@ -56,7 +60,7 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onStateChange(boolean newstate, int percentage) {
                 if (newstate) {
-                    myRef.setValue("OFF");
+                    myRef.child("thermostatValue").setValue("OFF");
                 } else {
                     this.onRotate(percentage);
                 }
@@ -64,33 +68,27 @@ public class HomeFragment extends BaseFragment {
 
             @Override
             public void onRotate(int percentage) {
-                myRef.setValue(percentage);
+                myRef.child("thermostatValue").setValue(percentage+"");
             }
         });
 
-        getmDatabase().child("user").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        getmDatabase().child("user").child(user.getUid()).child("device").child(mObjectId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                User mUser = dataSnapshot.getValue(User.class);
-                debug("POP");
-                log.setText(mUser.getDisplayName());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String data = dataSnapshot.getValue().toString();
-                if (!data.equals("OFF")) {
-                    mACMeter.setRotorPercentage(Integer.parseInt(data));
-                    mPercentage.setText(data + "%");
-                } else {
-                    mPercentage.setText(data);
+                try {
+                    ThermoStat mThermoStat= dataSnapshot.getValue(ThermoStat.class);
+                    Log.e("GTA",dataSnapshot.toString());
+                    log.setText(mThermoStat.getThermostatName());
+                    if (!mThermoStat.getThermostatValue().equals("OFF")) {
+                        mACMeter.setRotorPercentage(Integer.parseInt(mThermoStat.getThermostatValue()));
+                        mPercentage.setText(mThermoStat.getThermostatValue() + "%");
+                    } else {
+                        mPercentage.setText(mThermoStat.getThermostatValue());
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
+
             }
 
             @Override

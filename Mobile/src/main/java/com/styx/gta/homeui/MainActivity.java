@@ -18,17 +18,25 @@ import android.widget.Button;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.styx.gta.homeui.base.BaseAppCompatActivity;
 import com.styx.gta.homeui.fragment.HomeFragment;
+import com.styx.gta.homeui.model.ThermoStat;
 import com.styx.gta.homeui.ui.transformers.ZoomOutPageTransformer;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class MainActivity extends BaseAppCompatActivity {
 
     /**
      * The number of pages (wizard steps) to show in this demo.
      */
-    private static final int NUM_PAGES = 5;
-
+    private int NUM_PAGES = 0;
+    private ArrayList<ThermoStat> mThermoStatList;
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
@@ -45,7 +53,26 @@ public class MainActivity extends BaseAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        DatabaseReference mUserDevices = getmDatabase().child("user").child(getUid()).child("device");
+        mThermoStatList = new ArrayList<>();
+        mUserDevices.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                NUM_PAGES = ((int) dataSnapshot.getChildrenCount());
+                mThermoStatList.clear();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    ThermoStat mStat = postSnapshot.getValue(ThermoStat.class);
+                    mThermoStatList.add(mStat);
+                }
+                mPagerAdapter.notifyDataSetChanged();
 
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -54,7 +81,6 @@ public class MainActivity extends BaseAppCompatActivity {
 
         buttonSignout = (Button) findViewById(R.id.buttonSignout);
         buttonAddDevice = (Button) findViewById(R.id.buttonAddDevice);
-
         buttonSignout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,9 +94,11 @@ public class MainActivity extends BaseAppCompatActivity {
             }
         });
     }
+
     protected void addDevice() {
         startActivity(new Intent(getApplicationContext(), AddDeviceActivity.class));
     }
+
     @Override
     public void onBackPressed() {
         if (mPager.getCurrentItem() == 0) {
@@ -94,7 +122,15 @@ public class MainActivity extends BaseAppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return new HomeFragment();
+            if (mThermoStatList.size() <= 0) {
+                return new HomeFragment();
+            } else {
+                HomeFragment homeFragment = new HomeFragment();
+                Bundle mBundle = new Bundle();
+                mBundle.putString("ObjectID", mThermoStatList.get(position).getThermostatID());
+                homeFragment.setBundle(mBundle);
+                return homeFragment;
+            }
         }
 
         @Override

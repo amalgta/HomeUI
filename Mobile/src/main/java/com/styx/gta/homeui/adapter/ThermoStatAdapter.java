@@ -24,13 +24,13 @@ public class ThermoStatAdapter extends RecyclerView.Adapter<ThermoStatAdapter.My
 
     private List<ThermoStat> moviesList;
     private DatabaseReference mDatabaseReference;
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public FontTextView textViewDeviceID, textViewDeviceName, textViewDeviceValue;
+        public FontTextView textViewDeviceName, textViewDeviceValue;
         public Button buttonRemove;
 
         public MyViewHolder(View view) {
             super(view);
-            textViewDeviceID = (FontTextView) view.findViewById(R.id.textViewDeviceID);
             textViewDeviceName = (FontTextView) view.findViewById(R.id.textViewDeviceName);
             textViewDeviceValue = (FontTextView) view.findViewById(R.id.textViewDeviceValue);
             buttonRemove = (Button) view.findViewById(R.id.buttonRemove);
@@ -40,7 +40,7 @@ public class ThermoStatAdapter extends RecyclerView.Adapter<ThermoStatAdapter.My
 
     public ThermoStatAdapter(List<ThermoStat> moviesList, DatabaseReference mDatabaseReference) {
         this.moviesList = moviesList;
-        this.mDatabaseReference= mDatabaseReference;
+        this.mDatabaseReference = mDatabaseReference;
     }
 
     @Override
@@ -54,15 +54,13 @@ public class ThermoStatAdapter extends RecyclerView.Adapter<ThermoStatAdapter.My
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         final ThermoStat movie = moviesList.get(position);
-        holder.textViewDeviceID.setText(movie.getThermostatID());
-        holder.textViewDeviceName.setText(movie.getThermostatID());
-        holder.textViewDeviceValue.setText(movie.getThermostatValue()+"");
+        holder.textViewDeviceName.setText(movie.getThermostatName());
+        holder.textViewDeviceValue.setText(movie.getThermostatValue());
         holder.buttonRemove.setVisibility(View.VISIBLE);
         holder.buttonRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mDatabaseReference.child(movie.getThermostatID()).setValue(null);
-                Log.e("GTA",movie.getThermostatID());
             }
         });
     }
