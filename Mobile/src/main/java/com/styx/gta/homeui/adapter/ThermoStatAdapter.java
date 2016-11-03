@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
@@ -27,13 +28,13 @@ public class ThermoStatAdapter extends RecyclerView.Adapter<ThermoStatAdapter.My
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public FontTextView textViewDeviceName, textViewDeviceValue;
-        public Button buttonRemove;
+        public ImageButton buttonRemove;
 
         public MyViewHolder(View view) {
             super(view);
             textViewDeviceName = (FontTextView) view.findViewById(R.id.textViewDeviceName);
             textViewDeviceValue = (FontTextView) view.findViewById(R.id.textViewDeviceValue);
-            buttonRemove = (Button) view.findViewById(R.id.buttonRemove);
+            buttonRemove = (ImageButton) view.findViewById(R.id.buttonRemove);
         }
     }
 
