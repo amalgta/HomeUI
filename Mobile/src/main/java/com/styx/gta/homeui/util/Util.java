@@ -14,6 +14,4 @@ public abstract class Util {
             return email;
         }
     }
-    public void isLoggedIn(){
-    }
 }

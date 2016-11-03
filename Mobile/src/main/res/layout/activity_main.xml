@@ -18,11 +18,11 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar" />
+            android:id="@+id/frame_content"
+            android:layout_below="@+id/toolbar"></FrameLayout>
 
     </RelativeLayout>
 

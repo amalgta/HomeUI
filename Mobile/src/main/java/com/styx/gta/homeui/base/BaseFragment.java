@@ -4,6 +4,7 @@ package com.styx.gta.homeui.base;
  * Created by amal.george on 26-10-2016.
  */
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,8 +13,9 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
+import com.styx.gta.homeui.LoginActivity;
 
-public class BaseFragment extends Fragment{
+public class BaseFragment extends Fragment {
     protected FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     protected String TAG;
     protected boolean DEBUG;
@@ -35,6 +37,14 @@ public class BaseFragment extends Fragment{
     public BaseFragment() {
         TAG = this.getClass().getCanonicalName();
         DEBUG = false;
+    }
+
+    protected void signOut() {
+        ((BaseAppCompatActivity) getActivity()).signOut();
+    }
+
+    protected String getUid() {
+        return ((BaseAppCompatActivity) getActivity()).getUid();
     }
 
     @Override
