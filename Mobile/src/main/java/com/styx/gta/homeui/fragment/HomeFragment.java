@@ -26,6 +26,9 @@ public class HomeFragment extends BaseFragment {
     FontTextView textViewDeviceStatus;
     Button buttonManageDevice;
 
+    public HomeFragment(){
+        DEBUG=true;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -40,7 +43,10 @@ public class HomeFragment extends BaseFragment {
                 ((MainActivity) getActivity()).swap();
             }
         });
-        mDevices.addValueEventListener(new ValueEventListener() {
+        /**
+        debug(Util.getAppInstallUniqueID(getContext()));
+        **/
+         mDevices.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getChildrenCount() == 0) {

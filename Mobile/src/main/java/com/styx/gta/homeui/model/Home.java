@@ -22,6 +22,9 @@ public class Home {
     public interface ACCESS_PRIVILLEGE {
         String ADMIN = "admin";
     }
+    public interface USER_STATUS{
+        String ACTIVE_HOME = "active";
+    }
 
     public void setAccess(DatabaseReference mReference, String mUserID, String mAccessPrivillege) {
         mReference.child(HOME).child(homeID).child(USER).child(mUserID).child(ACCESS).setValue(mAccessPrivillege);
@@ -31,6 +34,10 @@ public class Home {
 
     public void setHomeID(String homeID) {
         this.homeID = homeID;
+    }
+
+    public String getHomeID() {
+        return homeID;
     }
 
     public Home() {

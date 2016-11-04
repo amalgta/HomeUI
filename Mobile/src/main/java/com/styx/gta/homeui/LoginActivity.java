@@ -32,7 +32,6 @@ import com.styx.gta.homeui.util.Constants;
 import com.styx.gta.homeui.util.Util;
 
 import static com.styx.gta.homeui.util.Constants.HOME;
-import static com.styx.gta.homeui.util.Constants.USER;
 
 public class LoginActivity extends BaseAppCompatActivity implements View.OnClickListener {
     // [START declare_auth]
@@ -223,8 +222,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     private void writeNewUser(FirebaseUser mUser) {
         debug("writeNewUser");
 
-        User user = new User(mUser.getProviderId(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
-        getmDatabase().child(USER).child(mUser.getUid()).setValue(user);
+        User user = new User(mUser.getUid(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
 
         DatabaseReference mTempHomeReference = getmDatabase().child(HOME).push();
 
@@ -233,6 +231,11 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
 
         mTempHomeReference.setValue(mTempHome);
         mTempHome.setAccess(getmDatabase(), getUid(), Home.ACCESS_PRIVILLEGE.ADMIN);
+//        user.setActiveHome(mTempHome.getHomeID());
+
+     //TODO
+        /**user.addHome(mTempHome.getHomeID(),Home.USER_STATUS.ACTIVE_HOME); **/
+        user.save(getmDatabase());
     }
 
 
