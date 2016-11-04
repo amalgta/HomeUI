@@ -1,6 +1,7 @@
 package com.styx.gta.homeui.model;
 
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
@@ -18,7 +19,10 @@ public class User {
 
     public User() {
     }
+    public void addAppInstance(String mAppInstance){
+        FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child("Instance").setValue(mAppInstance);
 
+    }
     public void save(DatabaseReference mDatabaseReference){
         mDatabaseReference.child(USER).child(this.getuserID()).setValue(this);
     }

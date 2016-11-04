@@ -231,6 +231,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
 
         mTempHomeReference.setValue(mTempHome);
         mTempHome.setAccess(getmDatabase(), getUid(), Home.ACCESS_PRIVILLEGE.ADMIN);
+        user.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
 //        user.setActiveHome(mTempHome.getHomeID());
 
      //TODO

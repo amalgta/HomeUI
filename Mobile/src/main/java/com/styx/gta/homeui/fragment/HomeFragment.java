@@ -43,9 +43,6 @@ public class HomeFragment extends BaseFragment {
                 ((MainActivity) getActivity()).swap();
             }
         });
-        /**
-        debug(Util.getAppInstallUniqueID(getContext()));
-        **/
          mDevices.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
