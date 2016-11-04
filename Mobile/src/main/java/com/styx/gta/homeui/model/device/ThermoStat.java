@@ -1,4 +1,4 @@
-package com.styx.gta.homeui.model;
+package com.styx.gta.homeui.model.device;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 

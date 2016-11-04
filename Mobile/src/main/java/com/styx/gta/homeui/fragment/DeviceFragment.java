@@ -12,10 +12,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.styx.gta.homeui.R;
 import com.styx.gta.homeui.base.BaseFragment;
-import com.styx.gta.homeui.model.ThermoStat;
+import com.styx.gta.homeui.model.device.ThermoStat;
 import com.styx.gta.homeui.ui.view.ACMeter.ACMeterView;
 import com.styx.gta.homeui.ui.view.FontTextView.FontTextView;
-import com.styx.gta.homeui.util.Constants;
 
 import static com.styx.gta.homeui.util.Constants.DEVICE;
 import static com.styx.gta.homeui.util.Constants.USER;

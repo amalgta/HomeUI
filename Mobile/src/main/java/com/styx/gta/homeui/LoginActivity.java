@@ -3,44 +3,36 @@ package com.styx.gta.homeui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.styx.gta.homeui.base.BaseAppCompatActivity;
-import com.styx.gta.homeui.model.ThermoStat;
+import com.styx.gta.homeui.model.Home;
 import com.styx.gta.homeui.model.User;
 import com.styx.gta.homeui.util.Constants;
 import com.styx.gta.homeui.util.Util;
 
-import java.util.ArrayList;
-import java.util.regex.Pattern;
+import static com.styx.gta.homeui.util.Constants.HOME;
+import static com.styx.gta.homeui.util.Constants.USER;
 
 public class LoginActivity extends BaseAppCompatActivity implements View.OnClickListener {
     // [START declare_auth]
@@ -54,6 +46,8 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     private Button buttonSignup;
     private Button buttonSignin;
     private SignInButton buttonGoogleSignIn;
+
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,7 +186,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
@@ -228,8 +222,17 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
 
     private void writeNewUser(FirebaseUser mUser) {
         debug("writeNewUser");
+
         User user = new User(mUser.getProviderId(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
-        getmDatabase().child("user").child(mUser.getUid()).setValue(user);
+        getmDatabase().child(USER).child(mUser.getUid()).setValue(user);
+
+        DatabaseReference mTempHomeReference = getmDatabase().child(HOME).push();
+
+        Home mTempHome = new Home("BASE HOME");
+        mTempHome.setHomeID(mTempHomeReference.getKey());
+
+        mTempHomeReference.setValue(mTempHome);
+        mTempHome.setAccess(getmDatabase(), getUid(), Home.ACCESS_PRIVILLEGE.ADMIN);
     }
 
 
@@ -247,6 +250,15 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
                 debug("ERROR GOOGLE SIGNIN GAILER");
                 // Google Sign In failed, update UI appropriately
             }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mGoogleApiClient != null ){
+            mGoogleApiClient.stopAutoManage(this);
+            mGoogleApiClient.disconnect();
         }
     }
 

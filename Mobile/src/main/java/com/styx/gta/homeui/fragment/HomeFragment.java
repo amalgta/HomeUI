@@ -1,8 +1,6 @@
 package com.styx.gta.homeui.fragment;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +13,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.styx.gta.homeui.MainActivity;
 import com.styx.gta.homeui.R;
 import com.styx.gta.homeui.base.BaseFragment;
-import com.styx.gta.homeui.model.ThermoStat;
-import com.styx.gta.homeui.ui.view.ACMeter.ACMeterView;
 import com.styx.gta.homeui.ui.view.FontTextView.FontTextView;
 
 import static com.styx.gta.homeui.util.Constants.DEVICE;

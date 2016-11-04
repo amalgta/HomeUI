@@ -8,6 +8,8 @@ public interface Constants {
      int GOOGLE_SIGN_IN=9001;
 
      String USER="user";
+     String ACCESS="access";
      String DEVICE="device";
+     String HOME="home";
 
 }

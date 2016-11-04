@@ -1,35 +1,25 @@
 package com.styx.gta.homeui.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.styx.gta.homeui.AddDeviceActivity;
-import com.styx.gta.homeui.MainActivity;
 import com.styx.gta.homeui.R;
 import com.styx.gta.homeui.base.BaseFragment;
-import com.styx.gta.homeui.model.ThermoStat;
+import com.styx.gta.homeui.model.device.ThermoStat;
 import com.styx.gta.homeui.ui.transformers.ZoomOutPageTransformer;
-import com.styx.gta.homeui.ui.view.ACMeter.ACMeterView;
-import com.styx.gta.homeui.ui.view.FontTextView.FontTextView;
 
 import java.util.ArrayList;
-
-import static com.styx.gta.homeui.util.Constants.DEVICE;
-import static com.styx.gta.homeui.util.Constants.USER;
 
 /**
  * Created by amal.george on 03-11-2016.
@@ -113,15 +103,11 @@ public class DevicePagerFragment extends BaseFragment {
 
         @Override
         public Fragment getItem(int position) {
-            if (mThermoStatList.size() <= 0) {
-                return new DeviceFragment();
-            } else {
-                DeviceFragment deviceFragment = new DeviceFragment();
-                Bundle mBundle = new Bundle();
-                mBundle.putString("ObjectID", mThermoStatList.get(position).getThermostatID());
-                deviceFragment.setBundle(mBundle);
-                return deviceFragment;
-            }
+            DeviceFragment deviceFragment = new DeviceFragment();
+            Bundle mBundle = new Bundle();
+            mBundle.putString("ObjectID", mThermoStatList.get(position).getThermostatID());
+            deviceFragment.setBundle(mBundle);
+            return deviceFragment;
         }
 
         @Override

@@ -2,20 +2,14 @@ package com.styx.gta.homeui;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -24,10 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.styx.gta.homeui.adapter.ThermoStatAdapter;
 import com.styx.gta.homeui.base.BaseAppCompatActivity;
-import com.styx.gta.homeui.model.ThermoStat;
-import com.styx.gta.homeui.model.User;
-import com.styx.gta.homeui.ui.transformers.ZoomOutPageTransformer;
-import com.styx.gta.homeui.util.Constants;
+import com.styx.gta.homeui.model.device.ThermoStat;
 
 import java.util.ArrayList;
 import java.util.List;
