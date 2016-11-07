@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -220,21 +221,13 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     }
 
     private void writeNewUser(FirebaseUser mUser) {
-        debug("writeNewUser");
 
-        User user = new User(mUser.getUid(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
-
-        DatabaseReference mTempHomeReference = getmDatabase().child(HOME).push();
-
-        Home mTempHome = new Home("BASE HOME");
-        mTempHome.setHomeID(mTempHomeReference.getKey());
-
-        mTempHomeReference.setValue(mTempHome);
-        mTempHome.setAccess(getmDatabase(), getUid(), Home.USER_ACCESS_PRIVILLEGE.ADMIN);
-
-        user.save(getmDatabase());
-        user.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
-        user.addHome(mTempHome.getHomeID(), User.HOME_STATUS.ACTIVE_HOME);
+        User mNewUser = new User(mUser.getUid(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
+        Home mNewHome = new Home(getmDatabase().child(HOME).push().getKey(), mUser.getDisplayName() + "'s Home");
+        mNewUser.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
+        mNewUser.addHome(mNewHome.getHomeID(), User.HOME_STATUS.ACTIVE_HOME);
+        mNewUser.tempSave();
+        mNewHome.setAccess(getmDatabase(), mNewUser.getuserID(), Home.USER_ACCESS_PRIVILLEGE.ADMIN);
     }
 
 

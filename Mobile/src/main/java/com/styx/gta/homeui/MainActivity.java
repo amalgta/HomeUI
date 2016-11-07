@@ -19,6 +19,7 @@ public class MainActivity extends BaseAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.frame_content, new HomeFragment()).commit();
 
@@ -36,6 +37,7 @@ public class MainActivity extends BaseAppCompatActivity {
                 addDevice();
             }
         });
+
     }
 
     public void swap() {

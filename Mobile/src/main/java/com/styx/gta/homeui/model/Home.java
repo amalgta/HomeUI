@@ -4,8 +4,13 @@ import android.provider.ContactsContract;
 import android.provider.SyncStateContract;
 
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.styx.gta.homeui.util.Constants;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.styx.gta.homeui.util.Constants.ACCESS;
 import static com.styx.gta.homeui.util.Constants.HOME;
@@ -23,10 +28,20 @@ public class Home {
         String ADMIN = "admin";
     }
 
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("homeID", homeID);
+        result.put("homeName", homeName);
+        return result;
+    }
+
     public void setAccess(DatabaseReference mReference, String mUserID, String mAccessPrivillege) {
         mReference.child(HOME).child(homeID).child(USER).child(mUserID).child(ACCESS).setValue(mAccessPrivillege);
     }
-    public void save(DatabaseReference mReference){
+
+    public void save() {
+        FirebaseDatabase.getInstance().getReference().child(HOME + "/" + homeID).updateChildren(this.toMap());
     }
 
     public void setHomeID(String homeID) {
@@ -40,8 +55,10 @@ public class Home {
     public Home() {
     }
 
-    public Home(String homeName) {
+    public Home(String homeID, String homeName) {
         this.homeName = homeName;
+        this.homeID = homeID;
+        this.save();
     }
 
     public String getHomeName() {
