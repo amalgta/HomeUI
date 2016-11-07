@@ -42,12 +42,9 @@ public class MainActivity extends BaseAppCompatActivity {
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-// Replace whatever is in the fragment_container view with this fragment,
-// and add the transaction to the back stack so the user can navigate back
         transaction.replace(R.id.frame_content, new DevicePagerFragment());
         transaction.addToBackStack(null);
 
-// Commit the transaction
         transaction.commit();
     }
 

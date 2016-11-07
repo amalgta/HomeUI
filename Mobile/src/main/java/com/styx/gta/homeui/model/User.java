@@ -6,6 +6,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
 
+import static com.styx.gta.homeui.util.Constants.HOME;
 import static com.styx.gta.homeui.util.Constants.USER;
 
 /**
@@ -17,11 +18,18 @@ public class User {
     private String displayName;
     private String email;
 
+    public interface HOME_STATUS{
+        boolean ACTIVE_HOME = true;
+        boolean INACTIVE_HOME= true;
+    }
+
     public User() {
     }
     public void addAppInstance(String mAppInstance){
-        FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child("Instance").setValue(mAppInstance);
-
+        FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child("instance").setValue(mAppInstance);
+    }
+    public void addHome(String mHomeID,boolean mHomeStatus){
+        FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(HOME).child(mHomeID).child("active").setValue(mHomeStatus);
     }
     public void save(DatabaseReference mDatabaseReference){
         mDatabaseReference.child(USER).child(this.getuserID()).setValue(this);

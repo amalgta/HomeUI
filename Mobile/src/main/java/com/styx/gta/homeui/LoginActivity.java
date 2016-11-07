@@ -230,13 +230,11 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         mTempHome.setHomeID(mTempHomeReference.getKey());
 
         mTempHomeReference.setValue(mTempHome);
-        mTempHome.setAccess(getmDatabase(), getUid(), Home.ACCESS_PRIVILLEGE.ADMIN);
-        user.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
-//        user.setActiveHome(mTempHome.getHomeID());
+        mTempHome.setAccess(getmDatabase(), getUid(), Home.USER_ACCESS_PRIVILLEGE.ADMIN);
 
-     //TODO
-        /**user.addHome(mTempHome.getHomeID(),Home.USER_STATUS.ACTIVE_HOME); **/
         user.save(getmDatabase());
+        user.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
+        user.addHome(mTempHome.getHomeID(), User.HOME_STATUS.ACTIVE_HOME);
     }
 
 
@@ -260,7 +258,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     @Override
     public void onPause() {
         super.onPause();
-        if (mGoogleApiClient != null ){
+        if (mGoogleApiClient != null) {
             mGoogleApiClient.stopAutoManage(this);
             mGoogleApiClient.disconnect();
         }

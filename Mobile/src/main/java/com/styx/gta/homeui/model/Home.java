@@ -19,11 +19,8 @@ public class Home {
     private String homeID;
     private String homeName;
 
-    public interface ACCESS_PRIVILLEGE {
+    public interface USER_ACCESS_PRIVILLEGE {
         String ADMIN = "admin";
-    }
-    public interface USER_STATUS{
-        String ACTIVE_HOME = "active";
     }
 
     public void setAccess(DatabaseReference mReference, String mUserID, String mAccessPrivillege) {
