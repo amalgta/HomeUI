@@ -10,6 +10,7 @@ public interface Constants {
      String USER="user";
      String ACCESS="access";
      String DEVICE="device";
+     String INSTANCE="instance";
      String HOME="home";
 
 }

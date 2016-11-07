@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.styx.gta.homeui.util.Util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.styx.gta.homeui.util.Constants.HOME;
+import static com.styx.gta.homeui.util.Constants.INSTANCE;
 import static com.styx.gta.homeui.util.Constants.USER;
 
 /**
@@ -26,6 +28,32 @@ public class User {
     private String userID;
     private String displayName;
     private String email;
+
+    public class Instance{
+        public String instanceID;
+        public String appInstanceID;
+        public String activeHome;
+        public Instance(String instanceID,String appInstanceID){
+            this.instanceID=instanceID;
+            this.appInstanceID=appInstanceID;
+            save();
+        }
+
+        public String getActiveHome() {
+            return activeHome;
+        }
+
+        public String getInstanceID() {
+            return instanceID;
+        }
+        public String getappInstanceID() {
+            return appInstanceID;
+        }
+
+        private void save(){
+            //FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(INSTANCE).push().setValue(this);
+        }
+    }
 
     public interface HOME_STATUS {
         boolean ACTIVE_HOME = true;
@@ -68,7 +96,7 @@ public class User {
     }
 
     public void addAppInstance(String mAppInstance) {
-        FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child("instance").setValue(mAppInstance);
+        Instance mNewInstance=new Instance(FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(INSTANCE).push().getKey(),mAppInstance);
     }
 
     public void addHome(String mHomeID, boolean mHomeStatus) {
