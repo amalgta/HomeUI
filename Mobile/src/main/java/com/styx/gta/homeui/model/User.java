@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.styx.gta.homeui.base.BaseObject;
 import com.styx.gta.homeui.util.Util;
 
 import java.lang.reflect.Field;
@@ -29,95 +30,6 @@ public class User {
     private String displayName;
     private String email;
 
-    public class Instance{
-        public String instanceID;
-        public String appInstanceID;
-        public String activeHome;
-        public Instance(String instanceID,String appInstanceID){
-            this.instanceID=instanceID;
-            this.appInstanceID=appInstanceID;
-            save();
-        }
-
-        public String getActiveHome() {
-            return activeHome;
-        }
-
-        public String getInstanceID() {
-            return instanceID;
-        }
-        public String getappInstanceID() {
-            return appInstanceID;
-        }
-
-        private void save(){
-            //FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(INSTANCE).push().setValue(this);
-        }
-    }
-
-    public interface HOME_STATUS {
-        boolean ACTIVE_HOME = true;
-        boolean INACTIVE_HOME = true;
-    }
-
-    public User() {
-    }
-
-    @Exclude
-    public Map<String, Object> toMap(String... mFields) {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("userID", userID);
-        result.put("displayName", displayName);
-        result.put("email", email);
-        return result;
-    }
-
-    /*    public Map<String, Object> toMapTest(String[]... mFields) {
-            HashMap<String, Object> result = new HashMap<>();
-            ArrayList<String> mChildFields = new ArrayList<>(Arrays.asList(mFields));
-            for (Field field : this.getClass().getDeclaredFields()) {
-                if (mChildFields.contains(field.getName())) {
-                    try {
-                        result.put(field.getName(), field.get(this).toString());
-                    } catch (Exception e) {
-                        Log.e("GTA_Error", "Illegal Access Error");
-                    }
-
-                }
-            }
-            return result;
-        }*/
-    public Map<String, Object> generateMap(String[]... mFields) {
-        HashMap<String, Object> result = new HashMap<>();
-        for (String[] field : mFields) {
-            result.put(field[0],field[1]);
-            }
-        return result;
-    }
-
-    public void addAppInstance(String mAppInstance) {
-        Instance mNewInstance=new Instance(FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(INSTANCE).push().getKey(),mAppInstance);
-    }
-
-    public void addHome(String mHomeID, boolean mHomeStatus) {
-        FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(HOME).child(mHomeID).child("active").setValue(mHomeStatus);
-    }
-
-    public void save() {
-        FirebaseDatabase.getInstance().getReference().child(USER).child(this.getuserID()).updateChildren(this.toMap());
-    }
-
-    public void tempSave() {
-        FirebaseDatabase.getInstance().getReference().child(USER).child(this.getuserID()).updateChildren(generateMap(new String[] { "One", "Two"}));
-    }
-
-    public User(String userID, String displayName, String email) {
-        this.userID = userID;
-        this.displayName = displayName;
-        this.email = email;
-        save();
-    }
-
     public String getDisplayName() {
         return this.displayName;
     }
@@ -128,5 +40,57 @@ public class User {
 
     public String getuserID() {
         return userID;
+    }
+
+    public void save() {
+        FirebaseDatabase.getInstance().getReference().child(USER).child(this.getuserID()).updateChildren(this.toMap());
+    }
+
+    public interface HOME_STATUS {
+        String ACTIVE_HOME = "true";
+    }
+
+    public void addAppInstance(String mAppInstance) {
+        new Instance(FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(INSTANCE).push().getKey(), mAppInstance);
+    }
+
+    public void addHome(String mHomeID, String mHomeStatus) {
+        FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(HOME).child(mHomeID).updateChildren(generateMap(new String[]{"active",mHomeStatus}));
+    }
+
+
+    public User(String userID, String displayName, String email) {
+        this.userID = userID;
+        this.displayName = displayName;
+        this.email = email;
+        save();
+    }
+
+
+    @IgnoreExtraProperties
+    class Instance extends BaseObject {
+        String instanceID;
+        String appInstanceID;
+        String activeHome;
+
+        Instance(String instanceID, String appInstanceID) {
+            this.instanceID = instanceID;
+            this.appInstanceID=appInstanceID;
+            save();
+        }
+        Instance(){
+
+        }
+        public void setAppInstanceID(String appInstanceID) {
+            this.appInstanceID = appInstanceID;
+        }
+
+        public void setActiveHome(String activeHome) {
+            this.activeHome = activeHome;
+        }
+
+        private void save() {
+            FirebaseDatabase.getInstance().getReference().child(USER).child(userID).child(INSTANCE).child(instanceID).updateChildren(this.toMap());
+        }
     }
 }

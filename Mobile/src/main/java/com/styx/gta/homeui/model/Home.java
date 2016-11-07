@@ -7,6 +7,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.styx.gta.homeui.base.BaseObject;
 import com.styx.gta.homeui.util.Constants;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ import static com.styx.gta.homeui.util.Constants.USER;
  * Created by amal.george on 25-10-2016.
  */
 @IgnoreExtraProperties
-public class Home {
+public class Home extends BaseObject{
     private String homeID;
     private String homeName;
 
@@ -37,7 +38,7 @@ public class Home {
     }
 
     public void setAccess(DatabaseReference mReference, String mUserID, String mAccessPrivillege) {
-        mReference.child(HOME).child(homeID).child(USER).child(mUserID).child(ACCESS).setValue(mAccessPrivillege);
+        mReference.child(HOME).child(homeID).child(USER).child(mUserID).updateChildren((generateMap(new String[]{ACCESS,mAccessPrivillege})));
     }
 
     public void save() {
@@ -58,7 +59,7 @@ public class Home {
     public Home(String homeID, String homeName) {
         this.homeName = homeName;
         this.homeID = homeID;
-        this.save();
+        save();
     }
 
     public String getHomeName() {

@@ -35,12 +35,9 @@ import com.styx.gta.homeui.util.Util;
 import static com.styx.gta.homeui.util.Constants.HOME;
 
 public class LoginActivity extends BaseAppCompatActivity implements View.OnClickListener {
-    // [START declare_auth]
     private FirebaseAuth mAuth;
-    // [END declare_auth]
-    // [START declare_auth_listener]
     private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth_listener]
+
     private EditText editTextEmail;
     private EditText editTextPassword;
     private Button buttonSignup;
@@ -201,6 +198,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
+
                         debug("USER EXISTS");
                     } else {
                         writeNewUser(user);
@@ -221,16 +219,12 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     }
 
     private void writeNewUser(FirebaseUser mUser) {
-
         User mNewUser = new User(mUser.getUid(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
-        Home mNewHome = new Home(getmDatabase().child(HOME).push().getKey(), mUser.getDisplayName() + "'s Home");
-
         mNewUser.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
+        //Home mNewHome = new Home(getmDatabase().child(HOME).push().getKey(), mUser.getDisplayName() + "'s Home");
 
-
-        mNewUser.addHome(mNewHome.getHomeID(), User.HOME_STATUS.ACTIVE_HOME);
-        mNewUser.tempSave();
-        mNewHome.setAccess(getmDatabase(), mNewUser.getuserID(), Home.USER_ACCESS_PRIVILLEGE.ADMIN);
+       // mNewUser.addHome(mNewHome.getHomeID(), User.HOME_STATUS.ACTIVE_HOME);
+        //mNewHome.setAccess(getmDatabase(), mNewUser.getuserID(), Home.USER_ACCESS_PRIVILLEGE.ADMIN);
     }
 
 
