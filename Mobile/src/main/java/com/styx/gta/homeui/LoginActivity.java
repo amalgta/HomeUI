@@ -30,6 +30,7 @@ import com.styx.gta.homeui.base.BaseAppCompatActivity;
 import com.styx.gta.homeui.model.Home;
 import com.styx.gta.homeui.model.User;
 import com.styx.gta.homeui.util.Constants;
+import com.styx.gta.homeui.util.TestActivity;
 import com.styx.gta.homeui.util.Util;
 
 import static com.styx.gta.homeui.util.Constants.HOME;
@@ -70,10 +71,12 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
     }
-
+    Class getMainClass(){
+        return  TestActivity.class;
+    }
     private void isLoggedIn(FirebaseUser user) {
         debug("isLoggedIn");
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        startActivity(new Intent(getApplicationContext(), getMainClass()));
         finish();
     }
 
@@ -205,7 +208,8 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
                         debug("USER NOT EXISTS");
                     }
                     debug("INTENT STARTED TO MAINACTIVITY");
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(), getMainClass()));
+//                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     finish();
                 }
 

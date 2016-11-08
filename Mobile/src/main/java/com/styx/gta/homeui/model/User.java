@@ -1,32 +1,21 @@
 package com.styx.gta.homeui.model;
 
-import android.util.Log;
-
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.styx.gta.homeui.base.BaseObject;
 import com.styx.gta.homeui.interfaces.FireBaseEntity;
-import com.styx.gta.homeui.util.Util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.styx.gta.homeui.util.Constants.HOME;
-import static com.styx.gta.homeui.util.Constants.INSTANCE;
 import static com.styx.gta.homeui.util.Constants.USER;
 
 /**
  * Created by amal.george on 25-10-2016.
  */
 @IgnoreExtraProperties
-public class User implements FireBaseEntity{
+public class User implements FireBaseEntity {
     private String userID;
     private String displayName;
     private String email;
@@ -44,16 +33,22 @@ public class User implements FireBaseEntity{
     }
 
     @Override
-    public void toMap() {
-
+    public DatabaseReference getDBPath() {
+        return FirebaseDatabase.getInstance().getReference().child(USER).child(userID);
     }
+
+    @Override
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("userID", userID);
+        result.put("displayName", displayName);
+        result.put("email", email);
+        return result;
+    }
+
     @Override
     public void save() {
-//        FirebaseDatabase.getInstance().getReference().child(USER).child(this.getuserID()).updateChildren(this.toMap());
-    }
-
-    public interface HOME_STATUS {
-        String ACTIVE_HOME = "true";
+        getDBPath().updateChildren(toMap());
     }
 
     public User(String userID, String displayName, String email) {
@@ -62,7 +57,11 @@ public class User implements FireBaseEntity{
         this.email = email;
         save();
     }
+    public User() {
 
+    }
 
-
+    public void addHome(Home newHome,String mAccessLevel){
+        getDBPath().child(HOME).child(newHome.getHomeID()+"/access").setValue(mAccessLevel);
+    }
 }
