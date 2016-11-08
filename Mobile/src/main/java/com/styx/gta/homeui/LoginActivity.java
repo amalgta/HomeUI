@@ -220,7 +220,7 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
 
     private void writeNewUser(FirebaseUser mUser) {
         User mNewUser = new User(mUser.getUid(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
-        mNewUser.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
+//        mNewUser.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
         //Home mNewHome = new Home(getmDatabase().child(HOME).push().getKey(), mUser.getDisplayName() + "'s Home");
 
        // mNewUser.addHome(mNewHome.getHomeID(), User.HOME_STATUS.ACTIVE_HOME);
