@@ -3,7 +3,9 @@ package com.styx.gta.homeui.model;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.styx.gta.homeui.base.BaseObject;
 import com.styx.gta.homeui.interfaces.FireBaseEntity;
+import com.styx.gta.homeui.model.Home;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,10 +17,14 @@ import static com.styx.gta.homeui.util.Constants.USER;
  * Created by amal.george on 25-10-2016.
  */
 @IgnoreExtraProperties
-public class User implements FireBaseEntity {
+public class User extends BaseObject{
     private String userID;
     private String displayName;
     private String email;
+
+    public class Constants{
+
+    }
 
     public String getDisplayName() {
         return this.displayName;
@@ -55,13 +61,15 @@ public class User implements FireBaseEntity {
         this.userID = userID;
         this.displayName = displayName;
         this.email = email;
-        save();
     }
     public User() {
 
     }
 
-    public void addHome(Home newHome,String mAccessLevel){
+    public void addAppInstance(UserInstance mUserInstance){
+
+    }
+    public void addHome(Home newHome, String mAccessLevel){
         getDBPath().child(HOME).child(newHome.getHomeID()+"/access").setValue(mAccessLevel);
     }
 }

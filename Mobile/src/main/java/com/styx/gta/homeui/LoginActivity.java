@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,20 +23,17 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.styx.gta.homeui.base.BaseAppCompatActivity;
-import com.styx.gta.homeui.model.Home;
 import com.styx.gta.homeui.model.User;
+import com.styx.gta.homeui.model.UserInstance;
 import com.styx.gta.homeui.util.Constants;
-import com.styx.gta.homeui.util.TestActivity;
 import com.styx.gta.homeui.util.Util;
 
-import static com.styx.gta.homeui.util.Constants.HOME;
+import static com.styx.gta.homeui.util.Constants.INSTANCE;
+import static com.styx.gta.homeui.util.Constants.USER;
 
 public class LoginActivity extends BaseAppCompatActivity implements View.OnClickListener {
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
 
     private EditText editTextEmail;
     private EditText editTextPassword;
@@ -49,15 +45,9 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DEBUG = true;
-
         super.onCreate(savedInstanceState);
 
-        if (getmAuth().getCurrentUser() != null) {
-            isLoggedIn(getmAuth().getCurrentUser());
-        }
-
-        setContentView(R.layout.activity_splash_screen);
+        setContentView(R.layout.activity_login);
 
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
@@ -68,16 +58,6 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
         buttonSignup.setOnClickListener(this);
         buttonSignin.setOnClickListener(this);
         buttonGoogleSignIn.setOnClickListener(this);
-        // [START initialize_auth]
-        mAuth = FirebaseAuth.getInstance();
-    }
-    Class getMainClass(){
-        return  TestActivity.class;
-    }
-    private void isLoggedIn(FirebaseUser user) {
-        debug("isLoggedIn");
-        startActivity(new Intent(getApplicationContext(), getMainClass()));
-        finish();
     }
 
     private void firebaseAuthWithCredential(AuthCredential credential) {
@@ -195,24 +175,17 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
     }
 
     private void onAuthSuccess(final FirebaseUser user) {
-        debug("onAuthSuccess");
         if (getmAuth().getCurrentUser() != null) {
             getmDatabase().child("user").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-
-                        debug("USER EXISTS");
                     } else {
                         writeNewUser(user);
-                        debug("USER NOT EXISTS");
                     }
-                    debug("INTENT STARTED TO MAINACTIVITY");
-                    startActivity(new Intent(getApplicationContext(), getMainClass()));
-//                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(), SplashScreenActivity.class));
                     finish();
                 }
-
                 @Override
                 public void onCancelled(DatabaseError firebaseError) {
                 }
@@ -224,10 +197,11 @@ public class LoginActivity extends BaseAppCompatActivity implements View.OnClick
 
     private void writeNewUser(FirebaseUser mUser) {
         User mNewUser = new User(mUser.getUid(), Util.usernameFromEmail(mUser.getEmail()), mUser.getEmail());
-//        mNewUser.addAppInstance(Util.getAppInstallUniqueID(getApplicationContext()));
+        UserInstance mCurrentInstance=new UserInstance(getmDatabase().child(USER+"/"+mNewUser.getuserID()+"/"+INSTANCE).push().getKey(),Util.getAppInstallUniqueID(getApplicationContext()),mNewUser);
+      //  mNewUser.addAppInstance();
         //Home mNewHome = new Home(getmDatabase().child(HOME).push().getKey(), mUser.getDisplayName() + "'s Home");
 
-       // mNewUser.addHome(mNewHome.getHomeID(), User.HOME_STATUS.ACTIVE_HOME);
+        // mNewUser.addHome(mNewHome.getHomeID(), User.HOME_STATUS.ACTIVE_HOME);
         //mNewHome.setAccess(getmDatabase(), mNewUser.getuserID(), Home.USER_ACCESS_PRIVILLEGE.ADMIN);
     }
 

@@ -20,91 +20,17 @@
             <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Login / Register"
+                android:text="AppName"
                 android:textSize="15sp"
                 android:textAlignment="center"
                 app:font="@string/regular_font_ext" />
-            <LinearLayout
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp"
-                android:weightSum="3">
+                android:id="@+id/progressBar" />
 
-                <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="User Name"
-                    android:textAlignment="center"
-                    app:font="@string/regular_font_ext" />
-
-                <EditText
-                    android:id="@+id/editTextEmail"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:elevation="10dp"
-                    android:inputType="textEmailAddress" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp"
-                android:weightSum="3">
-
-                <com.styx.gta.homeui.ui.view.FontTextView.FontTextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Password"
-                    android:textAlignment="center"
-                    app:font="@string/regular_font_ext" />
-
-                <EditText
-                    android:id="@+id/editTextPassword"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:elevation="10dp"
-                    android:inputType="textPassword" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="10dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/buttonSignup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Register" />
-
-                <Button
-                    android:id="@+id/buttonSignin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Login" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true">
-
-            <com.google.android.gms.common.SignInButton
-                android:id="@+id/buttonGoogleSignIn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp" />
         </LinearLayout>
 
     </RelativeLayout>
